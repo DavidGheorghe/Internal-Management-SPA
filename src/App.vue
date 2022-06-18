@@ -1,16 +1,22 @@
 <script setup lang="ts">
-import SideNavBar from '@/components/SideNavBar.vue';
+import TopNavBar from '@/components/menu/TopNavBar.vue';
 </script>
 
 <template>
-<SideNavBar v-show="$route.path !== '/login'">
-</SideNavBar>
+<TopNavBar v-show="$route.path !== '/login'">
+</TopNavBar>
+<div class="account-actions-container">
+  
+</div>
 <Suspense> 
-	<router-view :style="{'margin-left': 5 + 'vw'}"></router-view> 
+	<router-view ></router-view> 
+  <!-- :style="{'margin-top': 7 + 'vh'}" -->
 </Suspense>
 </template>
 
 <style>
+/* @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"); */
+
 body {
   margin: 0;
   padding: 0;

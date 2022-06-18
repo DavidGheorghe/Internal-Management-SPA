@@ -1,0 +1,48 @@
+<script setup lang="ts">
+
+const props = defineProps<{
+    label?: string
+}>();
+
+const emits = defineEmits<{
+    (e: 'click'): void
+}>();
+
+function sendClickEvent() {
+
+}
+</script>
+
+<template>
+<button
+    class="back-btn"
+    type="button"
+    @click="$emit('click')"
+>
+    <span class="material-symbols-outlined">arrow_back_ios_new</span>
+    {{label}}
+</button>
+</template>
+
+<style lang="less" scoped>
+
+.back-btn {
+    all: unset;    
+    background-color: #22c55e;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 18px;
+    color: #efefef;
+    // border: 1px solid #86efac;
+    // &:hover {
+    //     border: 1px solid #22c55e;
+    // }
+}
+
+.material-symbols-outlined {
+    font-size: 20px;
+}
+</style>

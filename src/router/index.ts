@@ -7,6 +7,7 @@ import ProductsView from '@/views/ProductsView.vue'
 import CustomersView from '@/views/CustomersView.vue'
 import UsersView from '@/views/UsersView.vue'
 import CalculatorView from '@/views/CalculatorView.vue'
+import CategoriesView from '@/views/CategoriesView.vue'
 import AddProductView from '@/views/AddProductView.vue'
 import UpdateProductView from '@/views/UpdateProductView.vue'
 import { useUserStore } from '@/stores/UserStore'
@@ -28,16 +29,16 @@ const goToHomeIfNotAdmin = (to: RouteLocationNormalized) => {
 }
 const routes: Array<RouteRecordRaw> = [
 	{
+		path: '/login',
+		name: 'Login',
+		component: LoginView
+	},
+	{
 		path: '/',
 		name: 'Dashboard',
 		component: DashboardView,
 		meta: {requiresAuthentication: true},
 		beforeEnter: [goToLoginIfNotAuthenticated]
-	},
-	{
-		path: '/login',
-		name: 'Login',
-		component: LoginView
 	},
 	{
 		path: '/orders',
@@ -55,6 +56,11 @@ const routes: Array<RouteRecordRaw> = [
 		path: '/colors',
 		name: 'Colors',
 		component: ColorsView
+	},
+	{
+		path: '/categories',
+		name: 'Categories',
+		component: CategoriesView
 	},
 	{
 		path: '/customers',

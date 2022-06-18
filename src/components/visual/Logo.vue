@@ -8,9 +8,9 @@ const props = defineProps({
 });
 let imgPath = ref<string>();
 if (props.circular) {
-    imgPath.value = require("../assets/logo-circular.png");
+    imgPath.value = require("../../assets/logo-circular.png");
 } else {
-    imgPath.value = require("../assets/logo.jpg");
+    imgPath.value = require("../../assets/logo.jpg");
 }
 </script>
 

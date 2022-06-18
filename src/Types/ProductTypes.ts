@@ -1,3 +1,5 @@
+import { ProductCategory } from "./ProductCategoryTypes"
+
 export type Product = {
     id: number,
     name: string,
@@ -25,10 +27,7 @@ export type ProductsData = {
     totalPages: number    
 }
 
-export type ProductCategory = {
-    id: number,
-    categoryName: string
-}
+
 
 export type ProductPrices = {
     id: number,
@@ -44,3 +43,4 @@ export type ProductSizes = {
     weight: number,
     width: number | null
 }
+

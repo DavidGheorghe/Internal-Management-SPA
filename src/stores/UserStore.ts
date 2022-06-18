@@ -34,7 +34,7 @@ export const useUserStore = defineStore('user', {
                 /** Set JWT tokens in LocalStorage. */
                 const accessToken = loginResponse.headers["access-token"];
                 const refreshToken = loginResponse.headers["refresh-token"];
-                localStorage.setItem("accessToken", accessToken);//"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIkNVU1RPTUVSX1JFQUQiLCJDVVNUT01FUl9XUklURSIsIk9SREVSX1JFQUQiLCJPUkRFUl9XUklURSIsIlBST0RVQ1RfUkVBRCIsIlBST0RVQ1RfV1JJVEUiLCJST0xFX0FETUlOIiwiUk9MRV9NQU5BR0VSIiwiVVNFUl9SRUFEIiwiVVNFUl9SRUFEX09XTiIsIlVTRVJfV1JJVEUiXSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2FwaS9hdXRoL2xvZ2luIiwiZXhwIjoxNjUzMzE4NzEwfQ.6DVxUu3zxHzlQMaCSACSRDYIO6ItmnbKKBEBZQjEM1k");
+                localStorage.setItem("accessToken", accessToken);
                 localStorage.setItem("refreshToken", refreshToken);
                 /** Set current user credentials. */
                 this.currentUserId = loginResponse.data.id;

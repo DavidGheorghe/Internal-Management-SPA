@@ -1,4 +1,4 @@
-import { ProductCategory } from "@/Types/ProductTypes";
+import { ProductCategory } from "@/Types/ProductCategoryTypes";
 import { APIUrls, axiosInstance } from "@/utils/Utils"
 import { ref } from "vue";
 

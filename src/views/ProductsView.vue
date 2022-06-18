@@ -1,27 +1,33 @@
 <script setup lang="ts">
-import Pagination from '@/components/Pagination.vue';
-import SearchBar from '@/components/SearchBar.vue';
-import SelectItem from '@/components/SelectItem.vue';
+import Pagination from '@/components/controls/Pagination.vue';
+import SearchBar from '@/components/controls/SearchBar.vue';
+import SelectItem from '@/components/controls/SelectItem.vue';
+import PageSizeIconsOptions from '@/components/controls/PageSizeIconsOptions.vue';
 import { useProductsStore } from '@/stores/ProductsStore';
-import { ProductsData } from '@/Types/ProductTypes';
-import { APIUrls } from '@/utils/Utils';
+import { Product, ProductsData } from '@/Types/ProductTypes';
+import { APIUrls, SizeType } from '@/utils/Utils';
 import { computed } from '@vue/reactivity';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { ProductCategoriesIds } from '@/Types/ProductCategoryTypes';
+import SwitchButton from '@/components/buttons/SwitchButton.vue';
+import AddButton from '@/components/buttons/AddButton.vue';
 
 const productsStore = useProductsStore();
 const router = useRouter();
 /** Variables declaration. */
-const showProducts = ref(true);
 
 const showSizes = ref(true);
 const toggleSizesLabel = computed(() => showSizes.value === true ? "Show Prices" : "Show Sizes");
+const switchSizesPricesButtonLabels = ["Sizes", "Prices"];
 const categoryFilterId = ref(-1);
+const filterCategoriesIds = ref<number[]>([]);
 
 const pageNo = ref(0);
 const pageSize = ref(15);
 const sortBy = ref("name");
 const sortDir = ref("asc");
+const searchText = ref("");
 
 const getProductsURL = computed(() => {
     let url: string;
@@ -39,10 +45,12 @@ const pageSizeOptions = ["5", "10", "15"];
 let productsData = ref<ProductsData>();
 let productsCategories = ref<string[]>([]);
 
+const filteredProducts = computed(() => productsData.value?.content.filter((product) => product.name.includes(searchText.value)));
+
 (await updateProductsData());
 (await updateProductsCategoriesNames());
 
-/** Functions implemntation. */
+/** Functions. */
 
 async function updateProductsData() {
     productsData.value = (await productsStore.fetchProducts(getProductsURL.value));
@@ -61,8 +69,20 @@ function updatePagesNumbers(totalPages: number) {
     }
 }
 
-function updatePageSize(newPageSize: string) {
-    pageSize.value = parseInt(newPageSize);
+function updatePageSize(sizeOption: SizeType) {
+    switch (sizeOption) {
+        case SizeType.SMALL:
+            pageSize.value = 15;
+            break;
+        case SizeType.MEDIUM:
+            pageSize.value = 10;
+            break;
+        case SizeType.LARGE:
+            pageSize.value = 5;
+            break;
+        default:
+            pageSize.value = 15;
+    }
 }
 
 function updatePageNumber(newPageNumber: number) {
@@ -70,7 +90,7 @@ function updatePageNumber(newPageNumber: number) {
 }
 
 function search(searchedText: string) {
-    // TODO implement search feature
+    searchText.value = searchedText;
 }
 
 async function updateCategoryFilter(selectedCategory: string) {
@@ -119,7 +139,7 @@ watch(getProductsURL, async () => {
 
 <template>
 <div class="products-view">
-    <header class="header">All Products</header>
+    <!-- <header class="header">All Products</header> -->
     <main>
         <div class="container">
             <div class="controls-container">
@@ -128,36 +148,49 @@ watch(getProductsURL, async () => {
                     @search-text="search"
                 ></SearchBar>
                 <SelectItem
-                    class="select-page-size-dropdown"
-                    :options=pageSizeOptions
-                    :default-option="pageSize.toString()"
-                    @update-value="updatePageSize"
-                ></SelectItem>
-                <SelectItem
                     class="select-product-category"
                     :options=productsCategories
+                    :default-option="'Choose Category'"
                     @update-value="updateCategoryFilter"
                 ></SelectItem>
-                <span class="toggle-sizes" @click="toggleSizes">{{toggleSizesLabel}}</span>
-                <button @click="goToAddPage">Add product</button>
+                <SwitchButton
+                    class="switch-sizes-prices-button"
+                    first-option="Prices"
+                    second-option="Sizes"
+                    :default-option-index=1
+                    @send-option="toggleSizes"
+                ></SwitchButton>
+                <PageSizeIconsOptions
+                    class="select-page-size"
+                    @selected-option="updatePageSize"
+                ></PageSizeIconsOptions>
+                <AddButton
+                    class="add-product-button"
+                    label="New Product"
+                    @click="goToAddPage"
+                ></AddButton>
             </div>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th id="name-th" class="header-sort-up" @click="sortByName">Name</th>
+                            <th 
+                                id="name-th" 
+                                class="header-sort-up" 
+                                @click="sortByName"
+                            >Name</th>
                             <th>Category</th>
-                            <th v-if="showSizes">Height (cm)</th>
-                            <th v-else>Production Cost (RON)</th>
-                            <th v-if="showSizes">Diameter (cm)</th>
-                            <th v-else>Price Without V.A.T. (RON)</th>
-                            <th v-if="showSizes">Weight (g)</th>
-                            <th v-else>Final Price (RON)</th>
-                            <th colspan="2">Actions</th>
+                            <th class="numerical-cell-header" v-if="showSizes">Height (cm)</th>
+                            <th class="numerical-cell-header" v-else>Production Cost (RON)</th>
+                            <th class="numerical-cell-header" v-if="showSizes">Diameter (cm)</th>
+                            <th class="numerical-cell-header" v-else>Price Without V.A.T. (RON)</th>
+                            <th class="numerical-cell-header" v-if="showSizes">Weight (g)</th>
+                            <th class="numerical-cell-header" v-else>Final Price (RON)</th>
+                            <th class="actions-header" colspan="2"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="product in productsData!.content" :key="product.id">
+                        <tr v-for="product in filteredProducts" :key="product.id">
                             <td>{{product.name}}</td>
                             <td>{{product.productCategory.categoryName}}</td>
                             <td class="numerical-cell" v-if="showSizes">{{product.productSizes.height}}</td>
@@ -166,8 +199,18 @@ watch(getProductsURL, async () => {
                             <td class="numerical-cell" v-else>{{product.productPrices.priceWithoutVAT}}</td>
                             <td class="numerical-cell" v-if="showSizes">{{product.productSizes.weight}}</td>
                             <td class="numerical-cell" v-else>{{product.productPrices.finalPrice}}</td>
-                            <td class="actions-cell" @click="goToUpdatePage(product.id)">Update</td>
-                            <td class="actions-cell">Delete</td>
+                            <td class="edit-cell">
+                                <div class="edit-cell-content-wrapper">
+                                    <span class="material-symbols-outlined edit" @click="goToUpdatePage(product.id)">edit</span>
+                                    <span class="icon-label">Edit</span> 
+                                </div>
+                            </td>
+                            <td class="delete-cell">
+                                <div class="delete-cell-content-wrapper">
+                                    <span class="material-symbols-outlined delete">delete</span>
+                                    <span class="icon-label">Delete</span>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -184,9 +227,12 @@ watch(getProductsURL, async () => {
 </div>
 </template>
 
-<style scoped>
+<style scoped lang="less">
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0");
+
 .products-view {
     height: 100%;
+    background-color:#efefef;
 }
 .header {
     height: 10%;
@@ -208,6 +254,51 @@ main {
     right: 10%;
     bottom: 10%;
     padding: 1%;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 2px 2px 2px 2px #959da0;
+}
+
+.controls-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 1%;
+    height: 10%;
+}
+
+.search-bar {
+    margin-left: 1%;
+    width: 50%;
+    height: 50%;
+}
+
+.select-page-size {
+    height: 35%;
+}
+
+.select-product-category {
+    height: 30%;
+}
+
+.switch-sizes-prices-button {
+    height: 40%;
+}
+
+.add-product-button {
+    background-color: #22c55e;//#77b994;
+    color: white;
+    height: 40%;
+}
+
+table {
+    table-layout: auto;
+    border-collapse: collapse;
+    width: 100%;
+    height: 100%;
+    box-shadow: 2px 2px 2px 2px whitesmoke;
 }
 
 .table-container {
@@ -216,41 +307,30 @@ main {
     max-height: 80vh;
 }
 
-.search-bar {
-    margin-left: 1%;
-    width: 70%;
-}
-
-table {
-    table-layout: fixed;
-    border-collapse: collapse;
-    width: 100%;
-    height: 100%;
-    border: 1px solid;
-}
-
 thead {
-    border-bottom: 1px solid;
+    background-color: #22c55e;//#77b994;
+    color: black;
 }
 
 th {
-    border-right: 1px solid;
     padding: 1%;
+    font-size: 1.1rem;//20px;
 }
 
 .header-sort-down::after, .header-sort-up::after {
     content: ' ';
     position: relative;
-    left: 10px;
+    left: 8px;
     border: 7px solid transparent;
+    cursor: pointer;
 }
 .header-sort-down::after {
-    top: 10px;
-    border-top-color: silver;
+    top: 15px;
+    border-top-color: black; //silver;
 }
 .header-sort-up::after {
     bottom: 15px;
-    border-bottom-color: silver;
+    border-bottom-color:black;// silver;
 }
 .header-sort-down,
 .header-sort-up {
@@ -259,26 +339,39 @@ th {
 td {
     padding: 0.5%;
     text-align: left;
-    border-bottom: 1px solid;
-    border-right: 1px solid;
-    font-weight: lighter;
+    font-weight: 490;
+    font-size: 1.1rem;//18px;
+}
+
+tbody tr {
+    border-bottom: 1px solid rgb(215, 209, 209);
 }
 
 tbody tr:nth-child(odd) {
-  background-color: rgb(212, 207, 207);
+    background-color: #efefef;
 }
 
-tbody tr:nth-child(even) {
-  background-color: rgb(238, 232, 232);
+.numerical-cell-header {
+    width: 10%;
+    line-break: normal;
+    font-size: 1rem;
 }
 
 .numerical-cell {
     text-align: right;
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric: proportional-nums;
+}
+.edit-cell, .delete-cell {
+    &-content-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }
 
 .actions-cell {
     text-align: center;
+    margin: 0 auto;
 }
 
 .toggle-sizes {
@@ -286,7 +379,22 @@ tbody tr:nth-child(even) {
 }
 
 .products-pagination {
-    display: flex;
-    justify-content: center;
+    height: 5%;
+}
+
+.material-symbols-outlined {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 48;
+    font-size: 22px;
+    cursor: pointer;
+    &.edit {
+        color: #fde047;
+    }
+    &.delete {
+        color: #dc2626;
+    }
 }
 </style>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/UserStore'
 import { ref } from 'vue';
-import LoadingSpinner from './LoadingSpinner.vue';
-import Logo from './Logo.vue';
+import LoadingSpinner from '@/components/visual/LoadingSpinner.vue';
+import Logo from '@/components/visual/Logo.vue';
 
 let username = ref<string>("");
 let password = ref<string>("");
@@ -69,6 +69,7 @@ async function login() {
     border-radius: 10px;
     display: flex;
     flex-direction: column;
+    box-shadow: 2px 2px 2px 2px rgb(199, 197, 197);
 }
 
 .logo {
@@ -103,7 +104,7 @@ form {
     position: fixed;
     bottom: 20px;
     cursor: pointer;
-    background-color: rgb(182, 179, 179);
+    background-color: #efefef;
     color: rgb(0, 0, 0);
     height: 30px;
     width: 65px;
@@ -112,7 +113,7 @@ form {
     border-style: ridge;
 }
 .submit-btn:hover {
-    background-color: rgb(114, 114, 116);
+    background-color: #d3cfcf;
 }
 
 input {
@@ -124,9 +125,11 @@ input {
     margin-bottom: 5px;
 }
 .wrong-credentials-notification {
-    position: fixed;
     padding: 2px;
-    color: rgb(63, 50, 50);
     font-size: 1.8vh;
+    background-color: #ff000045;
+    border-radius: 5px;
+    border: 1px solid #ff00005c;
+    color: #6a0303;
 }
 </style>

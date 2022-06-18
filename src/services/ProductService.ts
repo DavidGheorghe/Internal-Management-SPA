@@ -1,7 +1,8 @@
+import { ProductCategoriesIds } from '@/Types/ProductCategoryTypes';
 import { AddProductDTO, Product, ProductsData } from '@/Types/ProductTypes';
 import { APIUrls, axiosInstance } from "../utils/Utils";
 
-export async function getProducts(url: string): Promise<ProductsData> {
+export async function fetchProducts(url: string): Promise<ProductsData> {
     const response = await axiosInstance({
         method: 'get',
         url: url
@@ -16,7 +17,7 @@ export async function getProducts(url: string): Promise<ProductsData> {
     return fetchedData;
 }
 
-export async function getProductById(url: string): Promise<Product> {
+export async function fetchProductById(url: string): Promise<Product> {
     const response = await axiosInstance({
         method: 'get',
         url: url
@@ -45,3 +46,25 @@ export async function addProduct(newProduct: AddProductDTO): Promise<Product> {
     createdProduct.productSizes = response.data.productSizes;
     return createdProduct;
 }
+
+export async function fetchProductsByCategoriesIds(url: string, ids: ProductCategoriesIds): Promise<ProductsData> {
+    console.log(ids);
+    const response = await axiosInstance({
+        method: 'get',
+        url: url,
+        params: {
+            "ids": ids.ids
+        }
+    });
+    let fetchedData = {} as ProductsData;
+    fetchedData.content = response.data.content;
+    fetchedData.last = response.data.last;
+    fetchedData.pageNo = response.data.pageNo;
+    fetchedData.pageSize = response.data.pageSize;
+    fetchedData.totalPages = response.data.totalPages;
+    fetchedData.totalElements = response.data.totalElements;
+    return fetchedData;
+}
+
+// TODO: create function for fetched data (duplicated code).
+

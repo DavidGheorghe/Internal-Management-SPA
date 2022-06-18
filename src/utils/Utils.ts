@@ -1,5 +1,11 @@
 import axios from 'axios';
 
+export enum SizeType {
+    SMALL = "small",
+    MEDIUM = "medium",
+    LARGE = "large"
+}
+
 export class APIUrls {
     static readonly BASE_URL = "http://localhost:8080/api";
     static readonly API_LOGIN_URL = APIUrls.BASE_URL + "/auth/login/";
@@ -37,7 +43,7 @@ axiosInstance.interceptors.response.use(
                 originalConfig._retry = true;
                 try {
                     const rs = await getRefreshToken();
-                    const { accessToken } = rs.data; // get token from header!!!
+                    const { accessToken } = rs.headers["refresh-token"]; // get token from header!!!
                     localStorage.setItem("accessToken", accessToken);
                     return axiosInstance(originalConfig);
                 } catch (_error: any) {
