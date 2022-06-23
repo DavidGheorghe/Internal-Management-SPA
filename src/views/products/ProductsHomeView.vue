@@ -1,27 +1,26 @@
 <script setup lang="ts">
+import AddButton from '@/components/buttons/AddButton.vue';
+import SwitchButton from '@/components/buttons/SwitchButton.vue';
+import PageSizeIconsOptions from '@/components/controls/PageSizeIconsOptions.vue';
 import Pagination from '@/components/controls/Pagination.vue';
 import SearchBar from '@/components/controls/SearchBar.vue';
 import SelectItem from '@/components/controls/SelectItem.vue';
-import PageSizeIconsOptions from '@/components/controls/PageSizeIconsOptions.vue';
+import CustomModal from '@/components/visual/CustomModal.vue';
+import SimpleButton from '@/components/buttons/SimpleButton.vue';
+import XButton from '@/components/buttons/XButton.vue';
 import { useProductsStore } from '@/stores/ProductsStore';
-import { Product, ProductsData } from '@/Types/ProductTypes';
+import { ProductsData } from '@/Types/ProductTypes';
 import { APIUrls, SizeType } from '@/utils/Utils';
 import { computed } from '@vue/reactivity';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { ProductCategoriesIds } from '@/Types/ProductCategoryTypes';
-import SwitchButton from '@/components/buttons/SwitchButton.vue';
-import AddButton from '@/components/buttons/AddButton.vue';
 
 const productsStore = useProductsStore();
 const router = useRouter();
 /** Variables declaration. */
 
 const showSizes = ref(true);
-const toggleSizesLabel = computed(() => showSizes.value === true ? "Show Prices" : "Show Sizes");
-const switchSizesPricesButtonLabels = ["Sizes", "Prices"];
 const categoryFilterId = ref(-1);
-const filterCategoriesIds = ref<number[]>([]);
 
 const pageNo = ref(0);
 const pageSize = ref(15);
@@ -30,22 +29,22 @@ const sortDir = ref("asc");
 const searchText = ref("");
 
 const getProductsURL = computed(() => {
-    let url: string;
+    let url: string = APIUrls.API_PRODUCT_ROOT + "?pageNo=" + pageNo.value + "&pageSize=" + pageSize.value + "&sortBy=" + sortBy.value + "&sortDir=" + sortDir.value;;
     if (categoryFilterId.value !== -1) {
         url = APIUrls.API_PRODUCT_ROOT + "/category/" + categoryFilterId.value + "?pageNo=" + pageNo.value + "&pageSize=" + pageSize.value + "&sortBy=" + sortBy.value + "&sortDir=" + sortDir.value;
-    } else {
-        url = APIUrls.API_PRODUCT_ROOT + "?pageNo=" + pageNo.value + "&pageSize=" + pageSize.value + "&sortBy=" + sortBy.value + "&sortDir=" + sortDir.value;
+    }
+    if (searchText.value !== "") {
+        url = APIUrls.API_PRODUCT_ROOT + "/search?keyword=" + searchText.value + "&pageNo=" + pageNo.value + "&pageSize=" + pageSize.value + "&sortBy=" + sortBy.value + "&sortDir=" + sortDir.value;    
     }
     return url;
 })
 
 const pagesNumbers = ref<number[]>([]);
-const pageSizeOptions = ["5", "10", "15"];
 
 let productsData = ref<ProductsData>();
 let productsCategories = ref<string[]>([]);
 
-const filteredProducts = computed(() => productsData.value?.content.filter((product) => product.name.includes(searchText.value)));
+// const filteredProducts = computed(() => productsData.value?.content.filter((product) => product.name.includes(searchText.value)));
 
 (await updateProductsData());
 (await updateProductsCategoriesNames());
@@ -121,13 +120,18 @@ function sortByName() {
 }
 
 function goToAddPage() {
-    let url = "/products/add-product";
-    router.push(url);
+    const addProductPageURL = "/products/add-product";
+    router.push(addProductPageURL);
 }
 
 function goToUpdatePage(updatedProductId: number) {
-    let url = "/products/update-product/" + updatedProductId;
-    router.push(url);
+    const editProductPageURL = "/products/update-product/" + updatedProductId;
+    router.push(editProductPageURL);
+}
+
+function goToDeletePage(deletedProductId: number) {
+    const deleteProductPageURL = "/products/delete-product/" + deletedProductId;
+    router.push(deleteProductPageURL);
 }
 
 /** Update the products data, and page numbers, every time pageNo, pageSize, sortDir, sortBy variables modifies. */
@@ -138,42 +142,43 @@ watch(getProductsURL, async () => {
 </script>
 
 <template>
+
 <div class="products-view">
-    <!-- <header class="header">All Products</header> -->
     <main>
         <div class="container">
             <div class="controls-container">
                 <SearchBar 
                     class="search-bar"
                     @search-text="search"
-                ></SearchBar>
+                />
                 <SelectItem
                     class="select-product-category"
                     :options=productsCategories
                     :default-option="'Choose Category'"
                     @update-value="updateCategoryFilter"
-                ></SelectItem>
+                />
                 <SwitchButton
                     class="switch-sizes-prices-button"
                     first-option="Prices"
                     second-option="Sizes"
                     :default-option-index=1
                     @send-option="toggleSizes"
-                ></SwitchButton>
+                />
                 <PageSizeIconsOptions
                     class="select-page-size"
                     @selected-option="updatePageSize"
-                ></PageSizeIconsOptions>
+                />
                 <AddButton
                     class="add-product-button"
                     label="New Product"
                     @click="goToAddPage"
-                ></AddButton>
+                />
             </div>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
+                            <th>Id</th>
                             <th 
                                 id="name-th" 
                                 class="header-sort-up" 
@@ -181,17 +186,18 @@ watch(getProductsURL, async () => {
                             >Name</th>
                             <th>Category</th>
                             <th class="numerical-cell-header" v-if="showSizes">Height (cm)</th>
-                            <th class="numerical-cell-header" v-else>Production Cost (RON)</th>
+                            <th class="numerical-cell-header prices" v-else>Production Cost (RON)</th>
                             <th class="numerical-cell-header" v-if="showSizes">Diameter (cm)</th>
-                            <th class="numerical-cell-header" v-else>Price Without V.A.T. (RON)</th>
+                            <th class="numerical-cell-header prices" v-else>Price Without V.A.T. (RON)</th>
                             <th class="numerical-cell-header" v-if="showSizes">Weight (g)</th>
-                            <th class="numerical-cell-header" v-else>Final Price (RON)</th>
+                            <th class="numerical-cell-header prices" v-else>Final Price (RON)</th>
                             <th class="actions-header" colspan="2"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="product in filteredProducts" :key="product.id">
-                            <td>{{product.name}}</td>
+                        <tr v-for="product in productsData?.content" :key="product.id">
+                            <td>{{product.id}}</td>
+                            <td class="name">{{product.name}}</td>
                             <td>{{product.productCategory.categoryName}}</td>
                             <td class="numerical-cell" v-if="showSizes">{{product.productSizes.height}}</td>
                             <td class="numerical-cell" v-else>{{product.productPrices.productionCost}}</td>
@@ -201,13 +207,19 @@ watch(getProductsURL, async () => {
                             <td class="numerical-cell" v-else>{{product.productPrices.finalPrice}}</td>
                             <td class="edit-cell">
                                 <div class="edit-cell-content-wrapper">
-                                    <span class="material-symbols-outlined edit" @click="goToUpdatePage(product.id)">edit</span>
+                                    <span 
+                                        class="material-symbols-outlined edit" 
+                                        @click="goToUpdatePage(product.id)"
+                                    >edit</span>
                                     <span class="icon-label">Edit</span> 
                                 </div>
                             </td>
                             <td class="delete-cell">
                                 <div class="delete-cell-content-wrapper">
-                                    <span class="material-symbols-outlined delete">delete</span>
+                                    <span 
+                                        class="material-symbols-outlined delete"
+                                        @click="goToDeletePage(product.id)"
+                                    >delete</span>
                                     <span class="icon-label">Delete</span>
                                 </div>
                             </td>
@@ -219,12 +231,39 @@ watch(getProductsURL, async () => {
                 class="products-pagination"
                 :pages="pagesNumbers"
                 :page-number="pageNo"
-                :last="productsData?.last"
+                :page-no="pageNo"
+                :page-size="productsData!.pageSize"
+                :last="productsData!.last"
+                :total-elements="productsData!.totalElements"
+                :total-pages="productsData!.totalPages"
                 @update-page="updatePageNumber"
-            ></Pagination>
+            />
         </div>
     </main>
+    <div class="delete-product-modal" v-if="false">
+        <Teleport to="#modals">
+            <CustomModal>
+                <template
+                    #x-button
+                    class="modal-x-button"
+                >
+                    <XButton @click="router.back"/>
+                </template>
+                <template #title>
+                    <h2>Delete product </h2>
+                </template>
+                <template #ok-button>
+                    <SimpleButton 
+                        class="ok-button"
+                        label="Ok"
+                        @click="router.back"
+                    />
+                </template>
+            </CustomModal>
+        </Teleport>
+    </div>
 </div>
+
 </template>
 
 <style scoped lang="less">
@@ -313,7 +352,7 @@ thead {
 }
 
 th {
-    padding: 1%;
+    padding: 0.3% 0.2% 0.3% 0.2%;
     font-size: 1.1rem;//20px;
 }
 
@@ -341,6 +380,9 @@ td {
     text-align: left;
     font-weight: 490;
     font-size: 1.1rem;//18px;
+    &.name {
+        padding-left: 1%;
+    }
 }
 
 tbody tr {
@@ -352,9 +394,12 @@ tbody tr:nth-child(odd) {
 }
 
 .numerical-cell-header {
-    width: 10%;
+    width: 7%;
     line-break: normal;
     font-size: 1rem;
+    &.prices {
+        font-size: 0.95rem;
+    }
 }
 
 .numerical-cell {
@@ -372,10 +417,6 @@ tbody tr:nth-child(odd) {
 .actions-cell {
     text-align: center;
     margin: 0 auto;
-}
-
-.toggle-sizes {
-    cursor: pointer;
 }
 
 .products-pagination {

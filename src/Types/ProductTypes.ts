@@ -8,7 +8,7 @@ export type Product = {
     productSizes: ProductSizes
 }
 
-export type AddProductDTO = {
+export type ProductDTO = {
     name: string,
     productCategoryId: number,
     height: number,

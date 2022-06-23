@@ -4,17 +4,31 @@ import { computed, ref } from 'vue';
 const props = defineProps<{
     pages: number[],
     pageNumber: number,
-    last: boolean | undefined
+    last: boolean,
+    pageNo: number,
+    pageSize: number,
+    totalElements: number,
+    totalPages: number
 }>();
 const emits = defineEmits<{
     (e: 'updatePage', newPage: number): void
 }>();
 
 const currentPage = ref({
-    first: props.pageNumber === 1,
+    first: props.pageNo === 0,
     last: props.pages.length === 1 ? true : false,
     currentNumber: (props.pageNumber + 1) // + 1 because the page number on server side is 0 index based.
 });
+
+const resultsLabelFrom = computed(() => props.pageNo * props.pageSize + 1);
+const resultsLabelTo = computed(() => {
+    let to = resultsLabelFrom.value + props.pageSize - 1;
+    if (to > props.totalElements) {
+        to = props.totalElements;
+    }
+    return to;
+});
+const resultsLabel = computed(() => `Results from ${resultsLabelFrom.value.toString()} to ${resultsLabelTo.value} of ${props.totalElements}`)
 
 if (props.pages.length === 1) {
     currentPage.value.first = true;
@@ -69,14 +83,14 @@ function sendNewPageNumber(page: number) {
 <div class="pagination">
     <div 
         class="left-stepper-button" 
-        v-show="!currentPage.first" 
+        v-show="pageNo !== 0" 
         @click="sendNewPageNumber(1)"
     >
         <span class="material-symbols-outlined">keyboard_double_arrow_left</span>
     </div>
     <div 
         class="left-stepper-button" 
-        v-show="!currentPage.first" 
+        v-show="pageNo !== 0"
         @click="sendNewPageNumber(currentPage.currentNumber - 1)"
     >
         <span class="material-symbols-outlined">navigate_before</span>
@@ -93,17 +107,28 @@ function sendNewPageNumber(page: number) {
     </div>
     <div 
         class="right-stepper-button" 
-        v-show="!currentPage.last" 
+        v-show="!last" 
         @click="sendNewPageNumber(currentPage.currentNumber + 1)"
     >
         <span class="material-symbols-outlined">navigate_next</span>
     </div>
     <div 
         class="right-stepper-button" 
-        v-show="!currentPage.last" 
+        v-show="!last" 
         @click="sendNewPageNumber(pages[pages.length-1])"
     >
         <span class="material-symbols-outlined">keyboard_double_arrow_right</span>
+    </div>
+    <div class="results-label">
+        <!-- <span>{{resultsLabel}}</span> -->
+        <span>
+            Results from 
+            <strong>{{resultsLabelFrom}}</strong> 
+            to 
+            <strong>{{resultsLabelTo}}</strong>
+            of 
+            <strong>{{totalElements}}</strong>
+        </span>
     </div>
 </div>
 </template>
@@ -138,5 +163,10 @@ function sendNewPageNumber(page: number) {
   'opsz' 48;
   font-size: 24px;
   cursor: pointer;
+}
+
+.results-label {
+    position: absolute;
+    right: 2%;
 }
 </style>

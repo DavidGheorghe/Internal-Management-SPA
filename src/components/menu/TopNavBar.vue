@@ -9,12 +9,16 @@ const user = useUserStore();
 
 const areUserActionsDisplayed = ref(false);
 
-const items = router.getRoutes()
-    .filter(route => route.name !== 'Login' 
-            && route.name !== 'AddProductView' 
-            && route.name !== 'UpdateProductView');
+// const items = router.getRoutes()
+//     .filter(route => route.name !== 'Login' 
+//             && route.name !== 'AddProductView' 
+//             && route.name !== 'UpdateProductView');
 
-function toggleActions() {
+const items = router.getRoutes()
+    .filter(route => route.meta.isInNavbar === true);
+
+
+function toggleActions(): void {
     areUserActionsDisplayed.value = !areUserActionsDisplayed.value;
 }
 

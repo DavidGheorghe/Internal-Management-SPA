@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import TopNavBar from '@/components/menu/TopNavBar.vue';
+
+const styles = {
+	'margin-top': '7vh',
+	'height': 'calc(100% - 7vh)'
+}
 </script>
 
 <template>
@@ -9,8 +14,7 @@ import TopNavBar from '@/components/menu/TopNavBar.vue';
   
 </div>
 <Suspense> 
-	<router-view ></router-view> 
-  <!-- :style="{'margin-top': 7 + 'vh'}" -->
+	<router-view :style="styles"></router-view>
 </Suspense>
 </template>
 

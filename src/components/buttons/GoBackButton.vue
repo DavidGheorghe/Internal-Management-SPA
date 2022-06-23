@@ -36,10 +36,11 @@ function sendClickEvent() {
     cursor: pointer;
     font-size: 18px;
     color: #efefef;
-    // border: 1px solid #86efac;
-    // &:hover {
-    //     border: 1px solid #22c55e;
-    // }
+    border: 1px solid transparent;
+    &:hover {
+        border: 1px solid black;
+        color: black;
+    }
 }
 
 .material-symbols-outlined {

@@ -1,21 +1,25 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed } from '@vue/reactivity';
 
-defineProps<{
+const props = defineProps<{
+    modelValue: string,
     label?: string,
     placeholder?: string,
     required: boolean
 }>();
 
 const emits = defineEmits<{
-    (e: 'sendValue', value: string): void
+    (e: 'update:modelValue', value: string): void
 }>();
 
-const value = ref("");
-
-watch(value, () => {
-    emits("sendValue", value.value);
-})
+const value = computed({
+    get() {
+        return props.modelValue;
+    },
+    set(value) {
+        emits('update:modelValue', value);
+    }
+});
 </script>
 
 <template>
@@ -35,8 +39,6 @@ watch(value, () => {
 
 .input-string-container {
     height: 50px;
-    // width: 250px;
-    // height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -53,16 +55,13 @@ input {
     width: 100%;
     height: 50%;
     &:focus {
-        border-bottom: 1px solid black;
+        border-bottom: 1px solid #22c55e;
     }
 }
 
 label {
     text-align: start;
-    /* position: absolute; */
-    /* left: 0; */
     width: 100%;
-    /* color: #443e3e; */
     font-family: 'Segoe UI', serif;
     font-weight: 600;
 }

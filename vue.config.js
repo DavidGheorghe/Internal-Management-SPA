@@ -1,10 +1,11 @@
 const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
-  transpileDependencies: true,
+  transpileDependencies: [
+    'quasar'
+  ],
+
   lintOnSave: false,
-  devServer: {
-    port: 8081
-  },
+
   // chainWebpack: config => {
   //   config.module
   //     .rule('vue')
@@ -16,4 +17,14 @@ module.exports = defineConfig({
   //         }
   //     }))
   // }
+  devServer: {
+    port: 8081
+  },
+
+  pluginOptions: {
+    quasar: {
+      importStrategy: 'kebab',
+      rtlSupport: false
+    }
+  }
 })

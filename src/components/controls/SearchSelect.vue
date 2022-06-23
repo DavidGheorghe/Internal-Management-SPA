@@ -5,26 +5,34 @@ import { ref, watch } from 'vue';
 
 const props = defineProps<{
     options: SearchSelectOption[],
-    label?: string
+    label?: string,
+    modelValue: string,
 }>();
 
 const emits = defineEmits<{
-    (e: 'send-option', selectedOption: SearchSelectOption): void
+    (e: 'send-option', selectedOption: SearchSelectOption): void,
+    (e: 'update:modelValue', searchText: string): void
 }>();
 
-const searchedText = ref("");
-const showOptions = ref(false);
+const searchedText = computed({
+    get() {
+        return props.modelValue;
+    },
+    set(value) {
+        emits('update:modelValue', value);
+    }
+});
+const areOptionsDisplayed = ref(false);
 const selectedOption = ref<SearchSelectOption>();
-// const placeholder = ref("Search");
 const availableOptions = computed(() => props.options.filter(option => option.value.includes(searchedText.value))) // TODO: improve if necessary
 
 
 function displayOptions() {
-    showOptions.value = true;
+    areOptionsDisplayed.value = true;
 }
 
 function hideOptions() {
-    setTimeout(() => showOptions.value = false, 500);
+    setTimeout(() => areOptionsDisplayed.value = false, 500);
 }
 
 function selectOption(option: SearchSelectOption) {
@@ -37,36 +45,43 @@ function selectOption(option: SearchSelectOption) {
 <template>
 <div class="search-select-container">
     <label for="search-select">{{label}}</label>
-    <div class="input-container">
+    <div class="input-container" :class="{'active' : areOptionsDisplayed}">
         <input 
             class="search-bar"
             id="search-select" 
             type="search" 
+            autocomplete="off"
             v-model="searchedText" 
             placeholder="Search"
             @focusin="displayOptions"
+            @focusout="hideOptions" 
         >
         <span class="material-symbols-outlined">expand_more</span>
-    </div>
-    <div  
-        class="options"
-        v-show="showOptions"
-    >
-        <div 
-        id="option"
-        v-for="option in availableOptions" 
-        :key="option.id.valueOf()"
-        @click="selectOption(option)"
+        <div  
+            v-if="areOptionsDisplayed"
+            class="options"
         >
-            {{option.value}}
+            <div
+                v-if="availableOptions.length > 0"
+                id="option"
+                v-for="option in availableOptions" 
+                :key="option.id.valueOf()"
+                @click="selectOption(option)"
+            >
+                {{option.value}}
+            </div>
+            <div
+                v-else
+                class="empty-options">
+                <span>No Results.</span>
+            </div>
         </div>
     </div>
+    
 </div>
-
-
 </template>
 
-<style scoped>
+<style lang="less" scoped>
 
 input, label {
     all: unset;
@@ -84,14 +99,31 @@ input, label {
 
 #option {
     cursor: pointer;
+    padding: 5px;
+    &:hover {
+        background-color: #efefef;
+    }
 }
 
-
-
 .options {
-    border: 1px solid black;
+    border: 1px solid #aba6a6;
+    border-top: 0;
     position: absolute;
-    margin-bottom: -55px;
+    width: 100%;
+    box-sizing: border-box;
+    left: 0;
+}
+
+.empty-options {
+    height: 75px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    & span {
+        color: grey;
+        font-size: 1.8rem;
+    }
 }
 
 label {
@@ -105,19 +137,19 @@ label {
     height: 50%;
     width: 100%;
     position: relative;
-    /* box-sizing: border-box; */
-    border: 1px solid black;
+    border: 1px solid #aba6a6;
     margin-top: 5px;
 }
 
 .search-bar {
-    /* width: calc(100% - 24px); */
     width: 100%;
     height: 100%;
+    &:focus {
+        border-color: black;
+    }
 }
 
 #search-select::-webkit-search-cancel-button {
-    /* -webkit-appearance: none; */
     position: relative;
     margin-right: 20px;
 }
@@ -128,5 +160,6 @@ label {
     z-index: -1;
     display: inline;
     cursor: pointer;
+    height: 100%;
 }
 </style>

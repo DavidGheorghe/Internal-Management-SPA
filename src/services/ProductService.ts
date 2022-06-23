@@ -1,19 +1,15 @@
 import { ProductCategoriesIds } from '@/Types/ProductCategoryTypes';
-import { AddProductDTO, Product, ProductsData } from '@/Types/ProductTypes';
+import { ProductDTO, Product, ProductsData } from '@/Types/ProductTypes';
+import { AxiosResponse } from 'axios';
 import { APIUrls, axiosInstance } from "../utils/Utils";
 
+// TODO change approach to compute the url here, not recieve it as a parameter. 
 export async function fetchProducts(url: string): Promise<ProductsData> {
     const response = await axiosInstance({
         method: 'get',
         url: url
     })
-    let fetchedData = {} as ProductsData;
-    fetchedData.content = response.data.content;
-    fetchedData.last = response.data.last;
-    fetchedData.pageNo = response.data.pageNo;
-    fetchedData.pageSize = response.data.pageSize;
-    fetchedData.totalPages = response.data.totalPages;
-    fetchedData.totalElements = response.data.totalElements;
+    const fetchedData = createProductDataFromResponse(response);
     return fetchedData;
 }
 
@@ -22,33 +18,22 @@ export async function fetchProductById(url: string): Promise<Product> {
         method: 'get',
         url: url
     })
-    let fetchedData = {} as Product;
-    fetchedData.id = response.data.id;
-    fetchedData.name = response.data.name;
-    fetchedData.productCategory = response.data.productCategory;
-    fetchedData.productPrices = response.data.productPrices;
-    fetchedData.productSizes = response.data.productSizes;
-    return fetchedData;
+    const fetchedProduct = createProductFromResponse(response);
+    return fetchedProduct;
 }
 
-export async function addProduct(newProduct: AddProductDTO): Promise<Product> {
+export async function addProduct(newProduct: ProductDTO): Promise<Product> {
     const url = APIUrls.API_PRODUCT_ROOT;
     const response = await axiosInstance({
         method: 'post',
         url: url,
         data: newProduct
     });
-    let createdProduct = {} as Product;
-    createdProduct.id = response.data.id;
-    createdProduct.name = response.data.name;
-    createdProduct.productCategory = response.data.productCategory;
-    createdProduct.productPrices = response.data.productPrices;
-    createdProduct.productSizes = response.data.productSizes;
+    const createdProduct = createProductFromResponse(response);
     return createdProduct;
 }
 
 export async function fetchProductsByCategoriesIds(url: string, ids: ProductCategoriesIds): Promise<ProductsData> {
-    console.log(ids);
     const response = await axiosInstance({
         method: 'get',
         url: url,
@@ -56,15 +41,48 @@ export async function fetchProductsByCategoriesIds(url: string, ids: ProductCate
             "ids": ids.ids
         }
     });
-    let fetchedData = {} as ProductsData;
-    fetchedData.content = response.data.content;
-    fetchedData.last = response.data.last;
-    fetchedData.pageNo = response.data.pageNo;
-    fetchedData.pageSize = response.data.pageSize;
-    fetchedData.totalPages = response.data.totalPages;
-    fetchedData.totalElements = response.data.totalElements;
+    const fetchedData = createProductDataFromResponse(response);
     return fetchedData;
 }
 
-// TODO: create function for fetched data (duplicated code).
+export async function updateProduct(id: number, updatedProduct: ProductDTO) {
+    const url = APIUrls.API_PRODUCT_ROOT + "/" + id;
+    const response = await axiosInstance({
+        method: 'put',
+        url: url,
+        data: updatedProduct
+    });
+    const newlyUpdatedProduct = createProductFromResponse(response);
+    return newlyUpdatedProduct;
+}
 
+export async function fetchProductsFilteredBy(searchedText: string) {
+    const url = APIUrls.API_PRODUCT_ROOT + "/search?keyword=" + searchedText;
+    const response = await axiosInstance({
+        method: 'get',
+        url: url
+    });
+    const fetchedProducts = createProductDataFromResponse(response);
+    return fetchedProducts; 
+}
+
+function createProductFromResponse(response: AxiosResponse<any>) {
+    const product = {} as Product;
+    product.id = response.data.id;
+    product.name = response.data.name;
+    product.productCategory = response.data.productCategory;
+    product.productPrices = response.data.productPrices;
+    product.productSizes = response.data.productSizes;
+    return product;
+}
+
+function createProductDataFromResponse(response: AxiosResponse<any>) {
+    const productData = {} as ProductsData;
+    productData.content = response.data.content;
+    productData.last = response.data.last;
+    productData.pageNo = response.data.pageNo;
+    productData.pageSize = response.data.pageSize;
+    productData.totalPages = response.data.totalPages;
+    productData.totalElements = response.data.totalElements;
+    return productData;
+}

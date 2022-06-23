@@ -3,6 +3,6 @@ export type GenericArray<T> = {
 }
 
 export type SearchSelectOption = {
-    id: Number,
-    value: String
+    id: number,
+    value: string
 }

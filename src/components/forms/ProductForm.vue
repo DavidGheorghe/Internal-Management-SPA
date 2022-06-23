@@ -3,26 +3,36 @@ import { Product } from '@/Types/ProductTypes';
 import SearchSelect from '@/components/controls/SearchSelect.vue';
 import { SearchSelectOption } from '@/Types/GenericArrayType';
 import { getProductCategoriesWithoutPagination } from '@/services/ProductCategoryService';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useProductsStore } from '@/stores/ProductsStore';
 import InputString from '@/components/controls/InputString.vue';
 import InputNumber from '@/components/controls/InputNumber.vue';
+import SubmitButton from '../buttons/SubmitButton.vue';
+import SimpleButton from '../buttons/SimpleButton.vue';
+import { useRouter } from 'vue-router';
 
-defineProps<{
+const router = useRouter();
+const props = defineProps<{
     updatedProduct?: Product
+}>();
+
+const emits = defineEmits<{
+    (e: 'form-submitted'): void
 }>();
 
 const productsStore = useProductsStore();
 
 const categories = ref<SearchSelectOption[]>([]);
-const name = ref<string>();
-const height = ref<number>();
-const diameter = ref<number>();
-const weight = ref<number>();
-const priceWithoutVAT = ref<number>();
-const productionCost = ref<number>();
-const categoryId = ref<number>();
+const name = ref<string>(props.updatedProduct?.name || "");
+const height = ref<number>(props.updatedProduct?.productSizes.height || NaN);
+const diameter = ref<number>(props.updatedProduct?.productSizes.diameter || NaN);
+const weight = ref<number>(props.updatedProduct?.productSizes.weight || NaN);
+const priceWithoutVAT = ref<number>(props.updatedProduct?.productPrices.priceWithoutVAT || NaN);
+const productionCost = ref<number>(props.updatedProduct?.productPrices.productionCost || NaN);
+const categoryId = ref<number>(props.updatedProduct?.productCategory.id || NaN);
+const categoryFilterText = ref<string>(props.updatedProduct?.productCategory.categoryName ||"");
 
+const isSubmitButtonDisabled = computed(() => name.value !== "" && height.value !== 0 && diameter.value !== 0 && weight.value !== 0 && priceWithoutVAT.value !== 0 && productionCost.value !== 0 && categoryId.value !== 0);
 
 (await getProductsCategories());
 
@@ -41,31 +51,7 @@ function getSelectedCategory(selectedCategory: SearchSelectOption) {
     categoryId.value = selectedCategory.id.valueOf();
 }
 
-function updateName(newName: string) {
-    name.value = newName;
-}
-
-function updateHeight(newHeight: number) {
-    height.value = newHeight;
-}
-
-function updateDiameter(newDiameter: number) {
-    diameter.value = newDiameter;
-}
-
-function updateWeight(newWeight: number) {
-    weight.value = newWeight;
-}
-
-function updateProductionCost(newProductionCost: number) {
-    productionCost.value = newProductionCost;
-}
-
-function updatePriceWithoutVAT(newPriceWithoutVAT: number) {
-    priceWithoutVAT.value = newPriceWithoutVAT;
-}
-
-function addProduct() {
+function saveProduct() {
     const auxProduct = {
         "name": name.value!,
         "productCategoryId": categoryId.value!,
@@ -75,76 +61,100 @@ function addProduct() {
         "priceWithoutVAT": priceWithoutVAT.value!,
         "productionCost": productionCost.value!
     }
-    const addedProductDTO = productsStore.addProduct(auxProduct);
-    // console.log(addedProductDTO);
+    if (props.updatedProduct) {
+        // productsStore.updateProduct(props.updatedProduct.id, auxProduct);
+    } else {
+    //    productsStore.addProduct(auxProduct);
+    }
+    emits('form-submitted');    
+}
+
+function clearFields() {
+    name.value = "";
+    categoryFilterText.value = "";
+    height.value = NaN;
+    diameter.value = NaN;
+    weight.value = NaN;
+    priceWithoutVAT.value = NaN;
+    productionCost.value = NaN;
 }
 </script>
 
 <template>
 <div class="product-form-container">
     <form @submit.prevent>
-        <!-- <label for="product-name">Name
-            <input type="text" id="product-name" v-model="productName" :required="productName === undefined">
-        </label> -->
         <div class="name-and-category-section">
-            <span>Name & Category</span>
+            <span class="section-label">Name & Category</span>
             <InputString
-            class="name-input-field"
-            label="Name"
-            :required="true"
-            @send-value="updateName"
+                class="name-input-field"
+                label="Name"
+                :required="true"
+                v-model="name"
             ></InputString>
             <SearchSelect
                 class="search-select"
                 :options="categories"
                 label="Select Category"
+                v-model="categoryFilterText"
                 @send-option="getSelectedCategory"
             ></SearchSelect>
         </div>
-        <!-- <label for="product-height">Height
-            <input type="number" id="product-height" required v-model="productHeight">
-        </label> -->
         <div class="sizes-section">
-            <span>Sizes</span>
+            <span class="section-label">Sizes</span>
             <InputNumber
-            label="Height"
-            :required="true"
-            unit-measure="cm"
-            @send-value="updateHeight"
+                label="Height"
+                :required="true"
+                unit-measure="cm"
+                v-model="height"
             ></InputNumber>
             <InputNumber
                 label="Diameter"
                 :required="true"
                 unit-measure="cm"
-                @send-value="updateDiameter"
+                v-model="diameter"
             ></InputNumber>
             <InputNumber
                 label="Weight"
                 :required="true"
                 unit-measure="g"
-                @send-value="updateWeight"
+                v-model="weight"
             ></InputNumber>
         </div>
         <div class="prices-section">
-            <span>Prices</span>
+            <span class="section-label">Prices</span>
             <InputNumber
                 label="Production Cost"
                 :required="true"
                 unit-measure="RON"
-                @send-value="updateProductionCost"
+                v-model="productionCost"
             ></InputNumber>
             <InputNumber
                 label="Price without V.A.T"
                 :required="true"
                 unit-measure="RON"
-                @send-value="updatePriceWithoutVAT"
+                v-model="priceWithoutVAT"
             ></InputNumber>
         </div>
-        <div class="add-button">
-            <button 
-                type="submit"
-                @click="addProduct"
-            >Add Product</button>
+        <div class="cancel-button-wrapper">
+            <SimpleButton
+                class="cancel-button"
+                label="Cancel"
+                @click="router.back()"
+            ></SimpleButton>
+        </div>
+        <div class="add-button-wrapper">
+            <SubmitButton
+                class="add-button"
+                label="Save"
+                @submit="saveProduct"
+            ></SubmitButton>
+        </div>
+        <div class="clear-button-wrapper">
+            <SimpleButton
+                class="clear-button"
+                label="Clear All"
+                @click="clearFields"
+            ></SimpleButton>
         </div>
     </form>
 </div>
@@ -159,7 +169,6 @@ function addProduct() {
     background-color: white;
     box-shadow: 2px 2px 2px 2px #959da0;
 }
-
 form {
     height: 100%;
     box-sizing: border-box;
@@ -167,39 +176,85 @@ form {
     grid-auto-flow: row;
     grid-auto-rows: 1fr;
 }
-.search-select {
-    justify-content: center;
-    align-items: center;
-    position: relative;
+.name-and-category-section, .sizes-section {
+    border-bottom: 1px solid #9e9d9d;
 }
-
-.name-input-field {
+.name-and-category-section, .sizes-section, .prices-section {
     position: relative;
-    padding: 5px 45px 5px 45px;
-}
-
-.name-and-category-section {
-    & span {
-        position: absolute;
-        color: grey;
-        top: 1%;
-        left: 1%;
-    }
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     > * {
-        flex-grow: 1;
+        // flex-grow: 1;
+        flex-basis: 50%;
     }
 }
-.name-and-category-section, .sizes-section {
-    border-bottom: 1px solid #9e9d9d;
+
+.sizes-section, .prices-section {
+    justify-content: space-around;
+    > * {
+        flex-basis: auto;
+    }
 }
-.add-button {
+
+.prices-section {
+    justify-content: space-evenly;
+}
+.section-label {
+    position: absolute;
+    color: grey;
+    top: 2%;
+    left: 1%;    
+}
+.name-input-field {
+    position: relative;
+    padding: 5px 45px 5px 45px;
+}
+// .search-select {
+//     justify-content: center;
+//     align-items: center;
+//     position: relative;
+// }
+.add-button-wrapper {
     /* height: 10%; */
     position: absolute;
     bottom: 5%;
     right: 5%;
+}
+.add-button {
+    background-color: #22c55e;
+    color: white;
+    &:hover {
+        border: 1px solid black;
+        color: black;
+    }
+}
+.cancel-button-wrapper {
+    position: absolute;
+    bottom: 5%;
+    right: 15%;
+}
+
+.cancel-button {
+    background-color: #cbd5e1;
+    color: white;
+    &:hover {
+        border: 1px solid black;
+        color: black;
+    }
+}
+.clear-button-wrapper {
+    position: absolute;
+    bottom: 5%;
+    left: 5%;
+}
+.clear-button {
+    background-color: #60a5fa;// rgb(185, 184, 184);
+    color: white;
+    &:hover {
+        border: 1px solid black;
+        color: black;
+    }
 }
 </style>
