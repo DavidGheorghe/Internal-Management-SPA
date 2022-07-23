@@ -1,18 +1,25 @@
 <script setup lang="ts">
-import { SearchSelectOption } from '@/Types/GenericArrayType';
+import { SearchSelectOption } from '@/types/UtilsTypes';
 import { computed } from '@vue/reactivity';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 
 const props = defineProps<{
     options: SearchSelectOption[],
     label?: string,
     modelValue: string,
+    required: boolean
 }>();
 
 const emits = defineEmits<{
     (e: 'send-option', selectedOption: SearchSelectOption): void,
     (e: 'update:modelValue', searchText: string): void
 }>();
+
+const finalLabel = computed(() => {
+    if (props.required) {
+        return props.label + "*";
+    }
+});
 
 const searchedText = computed({
     get() {
@@ -44,7 +51,7 @@ function selectOption(option: SearchSelectOption) {
 
 <template>
 <div class="search-select-container">
-    <label for="search-select">{{label}}</label>
+    <label for="search-select">{{finalLabel}}</label>
     <div class="input-container" :class="{'active' : areOptionsDisplayed}">
         <input 
             class="search-bar"
@@ -53,6 +60,7 @@ function selectOption(option: SearchSelectOption) {
             autocomplete="off"
             v-model="searchedText" 
             placeholder="Search"
+            :required="required"
             @focusin="displayOptions"
             @focusout="hideOptions" 
         >
@@ -86,7 +94,6 @@ function selectOption(option: SearchSelectOption) {
 input, label {
     all: unset;
 }
-
 .search-select-container {
     padding: 5px 45px 5px 45px;
     height: 50px;
@@ -96,7 +103,6 @@ input, label {
     align-items: center;
     position: relative;
 }
-
 #option {
     cursor: pointer;
     padding: 5px;
@@ -104,16 +110,18 @@ input, label {
         background-color: #efefef;
     }
 }
-
 .options {
     border: 1px solid #aba6a6;
     border-top: 0;
     position: absolute;
     width: 100%;
+    max-height: 10rem;
     box-sizing: border-box;
     left: 0;
+    overflow: auto;
+    z-index: 99999;
+    background-color: white;
 }
-
 .empty-options {
     height: 75px;
     position: relative;
@@ -125,14 +133,12 @@ input, label {
         font-size: 1.8rem;
     }
 }
-
 label {
     width: 100%;
     text-align: start;
     font-family: 'Segoe UI', serif;
     font-weight: 600;
 }
-
 .input-container {
     height: 50%;
     width: 100%;
@@ -140,7 +146,6 @@ label {
     border: 1px solid #aba6a6;
     margin-top: 5px;
 }
-
 .search-bar {
     width: 100%;
     height: 100%;
@@ -148,12 +153,10 @@ label {
         border-color: black;
     }
 }
-
 #search-select::-webkit-search-cancel-button {
     position: relative;
     margin-right: 20px;
 }
-
 .material-symbols-outlined {
     position: absolute;
     right: 0;

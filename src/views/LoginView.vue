@@ -11,14 +11,12 @@ import LoginForm from "@/components/forms/LoginForm.vue";
 </div>
 </template>
 
-
-
 <style scoped>
 .background {
     width: 100%;
-    height: 100%;
+    height: 100% !important;
     background-color: #efefef;
-    margin-left: 0 !important;
+    margin-top: 0 !important;
     position: fixed;
 }
 

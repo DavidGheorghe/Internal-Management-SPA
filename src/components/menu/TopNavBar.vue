@@ -27,7 +27,7 @@ function displayActions() {
 }
 
 function hideActions(e: Event) {
-    console.log(e);
+    setTimeout(() => {}, 1000);
     areUserActionsDisplayed.value = false;
 }
 
@@ -66,12 +66,10 @@ function handleLogOut() {
         <Teleport
             to="#account-actions"
         >
-        <div v-if="areUserActionsDisplayed" class="account-actions-container">
             <AccountActions
+                :display="areUserActionsDisplayed"
                 @logout="handleLogOut"
-            >
-            </AccountActions>
-        </div>
+            />
         </Teleport>
     </div>
 </div>

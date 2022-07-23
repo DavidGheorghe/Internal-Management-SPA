@@ -2,7 +2,7 @@
 import { useRoute, useRouter } from 'vue-router';
 import { useProductsStore } from '@/stores/ProductsStore';
 import { computed, ref } from 'vue';
-import { APIUrls } from '@/utils/Utils';
+import { APIUrls } from '@/utils/APIURLs';
 import ProductForm from '@/components/forms/ProductForm.vue';
 import CustomModal from '@/components/visual/CustomModal.vue';
 import SimpleButton from '@/components/buttons/SimpleButton.vue';
@@ -13,7 +13,7 @@ const router = useRouter();
 const productsStore = useProductsStore();
 const updatedProductId = route.params.id;
 
-const getProductByIdURL = computed(() => APIUrls.API_PRODUCT_ROOT + "/" + updatedProductId); 
+const getProductByIdURL = computed(() => APIUrls.API_PRODUCTS_ROOT + "/" + updatedProductId); 
 const updatedProduct = (await productsStore.fetchProductById(getProductByIdURL.value));
 
 const isModalDisplayed = ref(false);
@@ -39,14 +39,11 @@ function hideModal() {
         :updated-product="updatedProduct"
         @form-submitted="displayModal"
     />
-    <Teleport v-if="isModalDisplayed" to="#modals">
-        <CustomModal @keyup.esc="router.back">
-            <template 
-                v-slot:x-button 
-                class="modal-x-button"
-            >
-                <XButton @click="router.back"/>
-            </template>
+    <Teleport to="#modals">
+        <CustomModal
+            :display="isModalDisplayed"
+            @x-button-click="router.back"
+            @keyup.esc="router.back">
             <template v-slot:title>
                 <h2>Product edited successfully!</h2>
             </template>

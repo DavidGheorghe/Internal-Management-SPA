@@ -1,9 +1,9 @@
 <script setup lang="ts">
 withDefaults(defineProps<{
     label?: string,
-    // disabled: boolean
+    isDisabled: boolean
 }>(), {
-    // disabled: false
+    isDisabled: false
 });
 // defineProps<{
 //     label?: string,
@@ -19,6 +19,7 @@ defineEmits<{
     <button 
         class="submit-btn"
         type="submit"
+        :disabled="isDisabled"
         @click="$emit('submit')"
     >
         {{label}}
@@ -30,9 +31,12 @@ defineEmits<{
     all: unset;
     width: 60px;
     height: 20px;
-    padding: 10%;
+    padding: 2px 4px 2px 2px;// 10%;
     text-align: center;
     border: 1px solid transparent;
     cursor: pointer;
+    &:disabled {
+        cursor: default;
+    }
 }
 </style>

@@ -8,18 +8,16 @@ const styles = {
 </script>
 
 <template>
-<TopNavBar v-show="$route.path !== '/login'">
-</TopNavBar>
-<div class="account-actions-container">
-  
-</div>
-<Suspense> 
-	<router-view :style="styles"></router-view>
-</Suspense>
+	<header>
+		<TopNavBar v-show="$route.path !== '/login'"/>
+	</header>
+	<Suspense> 
+		<router-view :style="styles"></router-view>
+	</Suspense>
 </template>
 
 <style>
-/* @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"); */
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0");
 
 body {
   margin: 0;

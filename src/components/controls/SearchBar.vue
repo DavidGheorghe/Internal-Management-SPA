@@ -1,55 +1,48 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
-const searchedText = ref("");
-const isFocused = ref(false);
-
-const emits = defineEmits<{
-    (e: 'searchText', searchedText: string): void;
+const props = defineProps<{
+    modelValue: string
 }>();
-
-function sendSearchedText() {
-    /* Send text only if the text is not blank, or on clear action. */
-    if (!isTextBlank() || searchedText.value === "") {
-        emits('searchText', searchedText.value);
-    }
-}
-
-/**
- * Regex to check if the text is blank.
- */
-function isTextBlank() {
-    return /^\s*$/.test(searchedText.value);
-}
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: string): void
+}>()
+const isFocused = ref(false);
 
 function clearText() {
     searchedText.value = "";
+    emit('update:modelValue', searchedText.value);
 }
 
-watch(searchedText, () => {
-    sendSearchedText();
+const searchedText = computed({
+    get() {
+        return props.modelValue;
+    },
+    set(value) {
+        emit('update:modelValue', value.trim());
+    }
 })
 </script>
 
 <template>
-<div 
-    class="search-bar-container" 
-    :class="{'focused': isFocused}"
->
-    <span class="material-symbols-outlined">search</span> 
-    <input 
-        class="input-search-bar"
-        type="search" 
-        v-model="searchedText"
-        @focusin="isFocused=true"
-        @focusout="isFocused=false"
-        placeholder="Search..."
+    <div 
+        class="search-bar-container" 
+        :class="{'focused': isFocused}"
     >
-    <span 
-        class="material-symbols-outlined close"
-        @click="clearText"
-    >close</span>
-</div>
+        <span class="material-symbols-outlined">search</span> 
+        <input 
+            class="input-search-bar"
+            type="search" 
+            v-model="searchedText"
+            @focusin="isFocused=true"
+            @focusout="isFocused=false"
+            placeholder="Search..."
+        >
+        <span 
+            class="material-symbols-outlined close"
+            @click="clearText"
+        >close</span>
+    </div>
 </template>
 
 <style lang="less" scoped>

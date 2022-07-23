@@ -1,16 +1,33 @@
 <script setup lang="ts">
 import { computed } from '@vue/reactivity';
 
-const props = defineProps<{
+// const props = defineProps<{
+//     modelValue: string,
+//     label?: string,
+//     placeholder?: string,
+//     required: boolean
+// }>();
+const props = withDefaults(defineProps<{
     modelValue: string,
     label?: string,
     placeholder?: string,
-    required: boolean
-}>();
-
+    required?: boolean
+    type?: 'email' | 'password' | 'text' | 'search'
+}>(), {
+    required: false,
+    type: 'text'
+});
 const emits = defineEmits<{
     (e: 'update:modelValue', value: string): void
 }>();
+
+const finalLabel = computed(() => {
+    let finalLabel = props.label;
+    if (props.required) {
+        finalLabel += '*';
+    }
+    return finalLabel;
+})
 
 const value = computed({
     get() {
@@ -23,16 +40,16 @@ const value = computed({
 </script>
 
 <template>
-<div class="input-string-container">
-    <label for="input-string">{{label}}</label>
-    <input 
-        type="text"
-        id="input-string"
-        :required="required"
-        :placeholder="placeholder"
-        v-model="value"
-    >
-</div>
+    <div class="input-string-container">
+        <label for="input-string">{{finalLabel}}</label>
+        <input 
+            type="text"
+            id="input-string"
+            :required="required"
+            :placeholder="placeholder"
+            v-model="value"
+        >
+    </div>
 </template>
 
 <style lang="less" scoped>

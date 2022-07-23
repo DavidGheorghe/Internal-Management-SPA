@@ -1,35 +1,40 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
 import XButton from '@/components/buttons/XButton.vue';
 
-const router = useRouter();
+defineProps<{
+    display: boolean
+}>();
 
 defineEmits<{
-    (e: 'hidden-modal'): void
+    (e: 'hidden-modal'): void,
+    (e: 'x-button-click'): void
 }>();
 </script>
 
 <template>
-<div class="backdrop">
-    <div class="content">
-        <div class="x-button-wrapper">
-            <!-- <slot name="x-button"></slot> -->
-            <XButton @click="router.back"/>
-        </div>
-        <div class="title-wrapper">
-            <slot name="title"></slot>
-        </div>
-        <div class="text-wrapper">
-            <slot name="text"></slot>
-        </div>
-        <div class="cancel-button-wrapper">
-            <slot name="cancel-button"></slot>
-        </div>
-        <div class="ok-button-wrapper">
-            <slot name="ok-button"></slot>
+    <div 
+        v-if="display"
+        @keydown.esc="$emit('hidden-modal')"
+        class="backdrop"
+    >
+        <div class="content">
+            <div class="x-button-wrapper">
+                <XButton @click="$emit('x-button-click')"/>
+            </div>
+            <div class="title-wrapper">
+                <slot name="title"></slot>
+            </div>
+            <div class="text-wrapper">
+                <slot name="text"></slot>
+            </div>
+            <div class="cancel-button-wrapper">
+                <slot name="cancel-button"></slot>
+            </div>
+            <div class="ok-button-wrapper">
+                <slot name="ok-button"></slot>
+            </div>
         </div>
     </div>
-</div>
 </template>
 
 <style scoped>

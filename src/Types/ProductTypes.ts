@@ -27,8 +27,6 @@ export type ProductsData = {
     totalPages: number    
 }
 
-
-
 export type ProductPrices = {
     id: number,
     finalPrice: number,
@@ -41,6 +39,5 @@ export type ProductSizes = {
     diameter: number,
     height: number,
     weight: number,
-    width: number | null
+    // width: number | null
 }
-

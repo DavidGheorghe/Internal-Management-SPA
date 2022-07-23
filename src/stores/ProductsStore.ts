@@ -1,8 +1,8 @@
-import { ProductDTO, ProductsData } from "@/Types/ProductTypes";
-import { addProduct, fetchProductById, fetchProducts, fetchProductsByCategoriesIds, fetchProductsFilteredBy, updateProduct } from "@/services/ProductService";
+import { ProductDTO, ProductsData } from "@/types/ProductTypes";
+import { addProduct, deleteProductById, fetchProductById, fetchProducts, fetchProductsByCategoriesIds, fetchProductsFilteredBy, updateProduct } from "@/services/ProductService";
 import { defineStore } from "pinia";
 import { getProductCategoriesNames, getProductCategoriesWithoutPagination } from "@/services/ProductCategoryService";
-import { ProductCategoriesIds } from "@/Types/ProductCategoryTypes";
+import { ProductCategoriesIds } from "@/types/ProductCategoryTypes";
 
 export const useProductsStore = defineStore('products', {
     state: () => {
@@ -52,6 +52,10 @@ export const useProductsStore = defineStore('products', {
         },
         async fetchProductsFilteredBy(searchedText: string) {
             const responseData = (await fetchProductsFilteredBy(searchedText));
+            return responseData;
+        },
+        async deleteProductById(id: number) {
+            const responseData = (await deleteProductById(id));
             return responseData;
         }
     }

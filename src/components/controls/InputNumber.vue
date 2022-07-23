@@ -3,7 +3,7 @@ import { computed } from '@vue/reactivity';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{
-    modelValue: number,
+    modelValue: number | null,
     label?: string,
     placeholder?: string,
     unitMeasure?: string,
@@ -20,6 +20,9 @@ const labelAndUM = computed(() => {
     } else if (props.label) {
         finalLabel = `${props.label}`
     }
+    if (props.required) {
+        finalLabel += '*';
+    }
     return finalLabel;
 });
 
@@ -28,28 +31,25 @@ const value = computed({
         return props.modelValue;
     },
     set(value) {
-        emits('update:modelValue', value);
+        if (value) {
+            emits('update:modelValue', value);
+        }
     }
 });
-
-// watch(value, () => {
-//     if (value.value) {
-//         emits("sendValue", value.value);
-//     }
-// })
 </script>
 
 <template>
-<div class="input-number-container">
-    <label for="input-number">{{labelAndUM}}</label>
-    <input 
-        type="number"
-        id="input-number"
-        :required="required"
-        :placeholder="placeholder"
-        v-model="value"
-    >
-</div>
+    <div class="input-number-container">
+        <label for="input-number">{{labelAndUM}}</label>
+        <input 
+            type="number"
+            id="input-number"
+            step=".01"
+            :required="required"
+            :placeholder="placeholder"
+            v-model="value"
+        >
+    </div>
 </template>
 
 <style lang="less" scoped>

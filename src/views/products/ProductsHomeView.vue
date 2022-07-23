@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import AddButton from '@/components/buttons/AddButton.vue';
+import ActionButton from '@/components/buttons/ActionButton.vue';
+import SimpleButton from '@/components/buttons/SimpleButton.vue';
 import SwitchButton from '@/components/buttons/SwitchButton.vue';
 import PageSizeIconsOptions from '@/components/controls/PageSizeIconsOptions.vue';
 import Pagination from '@/components/controls/Pagination.vue';
 import SearchBar from '@/components/controls/SearchBar.vue';
 import SelectItem from '@/components/controls/SelectItem.vue';
 import CustomModal from '@/components/visual/CustomModal.vue';
-import SimpleButton from '@/components/buttons/SimpleButton.vue';
-import XButton from '@/components/buttons/XButton.vue';
+import paginationParamsDefaults from "@/utils/PaginationParamsDefaults";
 import { useProductsStore } from '@/stores/ProductsStore';
-import { ProductsData } from '@/Types/ProductTypes';
-import { APIUrls, SizeType } from '@/utils/Utils';
-import { computed } from '@vue/reactivity';
+import { ProductsData } from '@/types/ProductTypes';
+import { PaginationParams } from '@/types/UtilsTypes';
+import { APIUrls } from "@/utils/APIURLs";
+import { SizeType } from '@/utils/Utils';
+import { computed, reactive } from '@vue/reactivity';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -22,22 +24,26 @@ const router = useRouter();
 const showSizes = ref(true);
 const categoryFilterId = ref(-1);
 
-const pageNo = ref(0);
-const pageSize = ref(15);
-const sortBy = ref("name");
-const sortDir = ref("asc");
+const productToBeDeletedId = ref<number>();
+const productToBeDeletedName = ref<string>();
+const isDeleteModalDisplayed = ref(false);
+const paginationParams = reactive<PaginationParams>(paginationParamsDefaults);
+paginationParams.pageSize = 15;
 const searchText = ref("");
 
 const getProductsURL = computed(() => {
-    let url: string = APIUrls.API_PRODUCT_ROOT + "?pageNo=" + pageNo.value + "&pageSize=" + pageSize.value + "&sortBy=" + sortBy.value + "&sortDir=" + sortDir.value;;
+    let url: string = APIUrls.API_PRODUCTS_ROOT + "?pageNo=" + paginationParams.pageNo + "&pageSize=" + paginationParams.pageSize + "&sortBy=" + paginationParams.sortBy + "&sortDir=" + paginationParams.sortDir;;
     if (categoryFilterId.value !== -1) {
-        url = APIUrls.API_PRODUCT_ROOT + "/category/" + categoryFilterId.value + "?pageNo=" + pageNo.value + "&pageSize=" + pageSize.value + "&sortBy=" + sortBy.value + "&sortDir=" + sortDir.value;
-    }
-    if (searchText.value !== "") {
-        url = APIUrls.API_PRODUCT_ROOT + "/search?keyword=" + searchText.value + "&pageNo=" + pageNo.value + "&pageSize=" + pageSize.value + "&sortBy=" + sortBy.value + "&sortDir=" + sortDir.value;    
+        url = APIUrls.API_PRODUCTS_ROOT + "/category/" + categoryFilterId.value + "?"; 
+        if (searchText.value !== "") {
+            url += "keyword=" + searchText.value + "&";
+        }
+        url += "pageNo=" + paginationParams.pageNo + "&pageSize=" + paginationParams.pageSize + "&sortBy=" + paginationParams.sortBy + "&sortDir=" + paginationParams.sortDir;
+    } else if (searchText.value !== "") {
+        url = APIUrls.API_PRODUCTS_ROOT + "/search?keyword=" + searchText.value + "&pageNo=" + paginationParams.pageNo + "&pageSize=" + paginationParams.pageSize + "&sortBy=" + paginationParams.sortBy + "&sortDir=" + paginationParams.sortDir;    
     }
     return url;
-})
+});
 
 const pagesNumbers = ref<number[]>([]);
 
@@ -71,25 +77,21 @@ function updatePagesNumbers(totalPages: number) {
 function updatePageSize(sizeOption: SizeType) {
     switch (sizeOption) {
         case SizeType.SMALL:
-            pageSize.value = 15;
+            paginationParams.pageSize = 15;
             break;
         case SizeType.MEDIUM:
-            pageSize.value = 10;
+            paginationParams.pageSize = 10;
             break;
         case SizeType.LARGE:
-            pageSize.value = 5;
+            paginationParams.pageSize = 5;
             break;
         default:
-            pageSize.value = 15;
+            paginationParams.pageSize = 15;
     }
 }
 
 function updatePageNumber(newPageNumber: number) {
-    pageNo.value = newPageNumber - 1; // substract 1 because the page number on server side is 0 index based.
-}
-
-function search(searchedText: string) {
-    searchText.value = searchedText;
+    paginationParams.pageNo = newPageNumber - 1; // substract 1 because the page number on server side is 0 index based.
 }
 
 async function updateCategoryFilter(selectedCategory: string) {
@@ -106,10 +108,10 @@ function toggleSizes() {
 }
 
 function sortByName() {
-    sortDir.value = sortDir.value === "asc" ? "desc" : "asc";
+    paginationParams.sortDir = paginationParams.sortDir === "asc" ? "desc" : "asc";
     const nameColumnHeader = document.getElementById("name-th");
     if (nameColumnHeader !== null) {
-        if (sortDir.value === "desc") {
+        if (paginationParams.sortDir === "desc") {
             nameColumnHeader.classList.remove("header-sort-up");
             nameColumnHeader.classList.add("header-sort-down");
         } else {
@@ -120,36 +122,45 @@ function sortByName() {
 }
 
 function goToAddPage() {
-    const addProductPageURL = "/products/add-product";
-    router.push(addProductPageURL);
+    const url = "/products/add-product";
+    router.push(url);
 }
 
-function goToUpdatePage(updatedProductId: number) {
-    const editProductPageURL = "/products/update-product/" + updatedProductId;
-    router.push(editProductPageURL);
+function goToUpdatePage(id: number) {
+    const url = "/products/update-product/" + id;
+    router.push(url);
 }
 
-function goToDeletePage(deletedProductId: number) {
-    const deleteProductPageURL = "/products/delete-product/" + deletedProductId;
-    router.push(deleteProductPageURL);
+function deleteProduct(id: number) {
+    productsStore.deleteProductById(id);
+    updateProductsData();
+    hideDeleteModal();
+}
+
+function displayDeleteModal(id: number, name: string) {
+    productToBeDeletedId.value = id;
+    productToBeDeletedName.value = name;
+    isDeleteModalDisplayed.value = true;
+}
+
+function hideDeleteModal() {
+    isDeleteModalDisplayed.value = false;
 }
 
 /** Update the products data, and page numbers, every time pageNo, pageSize, sortDir, sortBy variables modifies. */
 watch(getProductsURL, async () => {
-    productsData.value = (await productsStore.fetchProducts(getProductsURL.value));
-    updatePagesNumbers(productsData.value.totalPages);
-});
+    updateProductsData();
+}); 
 </script>
 
 <template>
-
-<div class="products-view">
+<div class="products-home">
     <main>
         <div class="container">
             <div class="controls-container">
                 <SearchBar 
                     class="search-bar"
-                    @search-text="search"
+                    v-model="searchText"
                 />
                 <SelectItem
                     class="select-product-category"
@@ -168,9 +179,10 @@ watch(getProductsURL, async () => {
                     class="select-page-size"
                     @selected-option="updatePageSize"
                 />
-                <AddButton
-                    class="add-product-button"
+                <ActionButton
+                    class="add-button"
                     label="New Product"
+                    action-type="add"
                     @click="goToAddPage"
                 />
             </div>
@@ -178,7 +190,7 @@ watch(getProductsURL, async () => {
                 <table>
                     <thead>
                         <tr>
-                            <th>Id</th>
+                            <th>ID</th>
                             <th 
                                 id="name-th" 
                                 class="header-sort-up" 
@@ -218,7 +230,7 @@ watch(getProductsURL, async () => {
                                 <div class="delete-cell-content-wrapper">
                                     <span 
                                         class="material-symbols-outlined delete"
-                                        @click="goToDeletePage(product.id)"
+                                        @click="displayDeleteModal(product.id, product.name)"
                                     >delete</span>
                                     <span class="icon-label">Delete</span>
                                 </div>
@@ -229,9 +241,7 @@ watch(getProductsURL, async () => {
             </div>
             <Pagination
                 class="products-pagination"
-                :pages="pagesNumbers"
-                :page-number="pageNo"
-                :page-no="pageNo"
+                :page-no="productsData!.pageNo"
                 :page-size="productsData!.pageSize"
                 :last="productsData!.last"
                 :total-elements="productsData!.totalElements"
@@ -240,23 +250,27 @@ watch(getProductsURL, async () => {
             />
         </div>
     </main>
-    <div class="delete-product-modal" v-if="false">
+    <div class="delete-product-modal">
         <Teleport to="#modals">
-            <CustomModal>
-                <template
-                    #x-button
-                    class="modal-x-button"
-                >
-                    <XButton @click="router.back"/>
-                </template>
+            <CustomModal 
+                :display="isDeleteModalDisplayed"
+                @x-button-click="hideDeleteModal"
+            >
                 <template #title>
-                    <h2>Delete product </h2>
+                    <h2>Delete product <div class="deleted-product-name">{{productToBeDeletedName}}</div>?</h2>
+                </template>
+                <template #cancel-button>
+                    <SimpleButton 
+                        class="no-button"
+                        label="No"
+                        @click="hideDeleteModal"
+                    />
                 </template>
                 <template #ok-button>
                     <SimpleButton 
                         class="ok-button"
                         label="Ok"
-                        @click="router.back"
+                        @click="deleteProduct(productToBeDeletedId!)"
                     />
                 </template>
             </CustomModal>
@@ -269,7 +283,7 @@ watch(getProductsURL, async () => {
 <style scoped lang="less">
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0");
 
-.products-view {
+.products-home {
     height: 100%;
     background-color:#efefef;
 }
@@ -326,7 +340,7 @@ main {
     height: 40%;
 }
 
-.add-product-button {
+.add-button {
     background-color: #22c55e;//#77b994;
     color: white;
     height: 40%;
@@ -437,5 +451,10 @@ tbody tr:nth-child(odd) {
     &.delete {
         color: #dc2626;
     }
+}
+
+.deleted-product-name {
+    display: inline;
+    color: #60a5fa;
 }
 </style>

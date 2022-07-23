@@ -1,7 +1,8 @@
-import { ProductCategoriesIds } from '@/Types/ProductCategoryTypes';
-import { ProductDTO, Product, ProductsData } from '@/Types/ProductTypes';
+import { ProductCategoriesIds } from '@/types/ProductCategoryTypes';
+import { ProductDTO, Product, ProductsData } from '@/types/ProductTypes';
 import { AxiosResponse } from 'axios';
-import { APIUrls, axiosInstance } from "../utils/Utils";
+import { axiosInstance } from "../utils/Utils";
+import { APIUrls } from "@/utils/APIURLs";
 
 // TODO change approach to compute the url here, not recieve it as a parameter. 
 export async function fetchProducts(url: string): Promise<ProductsData> {
@@ -11,6 +12,16 @@ export async function fetchProducts(url: string): Promise<ProductsData> {
     })
     const fetchedData = createProductDataFromResponse(response);
     return fetchedData;
+}
+
+export async function fetchAllProducts() {
+    const url = APIUrls.API_PRODUCTS_ROOT + "/all";
+    const response = await axiosInstance({
+        method: 'get',
+        url: url
+    });
+    const fetchedProducts = response.data;
+    return fetchedProducts;
 }
 
 export async function fetchProductById(url: string): Promise<Product> {
@@ -23,14 +34,14 @@ export async function fetchProductById(url: string): Promise<Product> {
 }
 
 export async function addProduct(newProduct: ProductDTO): Promise<Product> {
-    const url = APIUrls.API_PRODUCT_ROOT;
+    const url = APIUrls.API_PRODUCTS_ROOT;
     const response = await axiosInstance({
         method: 'post',
         url: url,
         data: newProduct
     });
-    const createdProduct = createProductFromResponse(response);
-    return createdProduct;
+    const addedProduct = createProductFromResponse(response);
+    return addedProduct;
 }
 
 export async function fetchProductsByCategoriesIds(url: string, ids: ProductCategoriesIds): Promise<ProductsData> {
@@ -45,25 +56,35 @@ export async function fetchProductsByCategoriesIds(url: string, ids: ProductCate
     return fetchedData;
 }
 
-export async function updateProduct(id: number, updatedProduct: ProductDTO) {
-    const url = APIUrls.API_PRODUCT_ROOT + "/" + id;
+export async function updateProduct(id: number, productWithUpdates: ProductDTO) {
+    const url = APIUrls.API_PRODUCTS_ROOT + "/" + id;
     const response = await axiosInstance({
         method: 'put',
         url: url,
-        data: updatedProduct
+        data: productWithUpdates
     });
     const newlyUpdatedProduct = createProductFromResponse(response);
     return newlyUpdatedProduct;
 }
 
 export async function fetchProductsFilteredBy(searchedText: string) {
-    const url = APIUrls.API_PRODUCT_ROOT + "/search?keyword=" + searchedText;
+    const url = APIUrls.API_PRODUCTS_ROOT + "/search?keyword=" + searchedText;
     const response = await axiosInstance({
         method: 'get',
         url: url
     });
     const fetchedProducts = createProductDataFromResponse(response);
     return fetchedProducts; 
+}
+
+export async function deleteProductById(id: number) {
+    const url = APIUrls.API_PRODUCTS_ROOT + "/" + id;
+    const response = await axiosInstance({
+        method: 'delete',
+        url: url
+    });
+    const deletedProduct = createProductFromResponse(response);
+    return deletedProduct;
 }
 
 function createProductFromResponse(response: AxiosResponse<any>) {

@@ -1,4 +1,8 @@
-import axios from 'axios';
+import { OrderStatus } from '@/types/OrderTypes';
+import { EntityData } from '@/types/UtilsTypes';
+import axios, { AxiosResponse } from 'axios';
+import { APIUrls } from './APIURLs';
+import { getLocalAccessToken, getRefreshToken } from './JWTUtils';
 
 export enum SizeType {
     SMALL = "small",
@@ -6,25 +10,9 @@ export enum SizeType {
     LARGE = "large"
 }
 
-export class APIUrls {
-    static readonly BASE_URL = "http://localhost:8080/api";
-    static readonly API_LOGIN_URL = APIUrls.BASE_URL + "/auth/login/";
-    static readonly API_REFRESH_TOKEN = APIUrls.BASE_URL + "/auth/refresh-token";
-    static readonly API_PRODUCT_ROOT = APIUrls.BASE_URL + "/products";
-    static readonly API_PRODUCT_CATEGORY = APIUrls.BASE_URL + "/product-categories";
-}
-
 const requestHeaders = {
     "Content-Type" : "application/json",
     "Authorization" : getLocalAccessToken()
-}
-
-export function getLocalAccessToken() {
-    return localStorage.getItem("accessToken");
-}
-
-export function getLocalRefreshToken() {
-    return localStorage.getItem("refreshToken");
 }
 
 export const axiosInstance = axios.create({
@@ -43,7 +31,7 @@ axiosInstance.interceptors.response.use(
                 originalConfig._retry = true;
                 try {
                     const rs = await getRefreshToken();
-                    const { accessToken } = rs.headers["refresh-token"]; // get token from header!!!
+                    const accessToken  = rs.headers["refresh-token"];
                     localStorage.setItem("accessToken", accessToken);
                     return axiosInstance(originalConfig);
                 } catch (_error: any) {
@@ -61,12 +49,24 @@ axiosInstance.interceptors.response.use(
     }
 )
 
-async function getRefreshToken() {
-    return await axios({
-        url: APIUrls.API_REFRESH_TOKEN,
-        headers: {
-            "Authorization": getLocalRefreshToken()
-        }
-    });
+
+export function createEntityDataFromResponse<T> (response: AxiosResponse<any>) {
+    const productData = {} as EntityData<T>;
+    productData.content = response.data.content;
+    productData.last = response.data.last;
+    productData.pageNo = response.data.pageNo;
+    productData.pageSize = response.data.pageSize;
+    productData.totalPages = response.data.totalPages;
+    productData.totalElements = response.data.totalElements;
+    return productData;
 }
 
+export const statusesAsStrings: string[] = [ 
+    OrderStatus[OrderStatus.NEW],
+    OrderStatus[OrderStatus.POURING],
+    OrderStatus[OrderStatus.DRYING],
+    OrderStatus[OrderStatus.SANDING],
+    OrderStatus[OrderStatus.SEALING],
+    OrderStatus[OrderStatus.PACKING],
+    OrderStatus[OrderStatus.READY],
+]

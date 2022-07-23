@@ -1,9 +1,10 @@
 import router from "@/router";
 import axios from 'axios';
 import { defineStore } from "pinia";
-import { APIUrls } from '../utils/Utils';
+import { APIUrls } from "@/utils/APIURLs";
 import { UserStoreState } from "./UserStoreStateI";
-import { Role } from '@/Types/Role';
+import { Role } from '@/types/Role';
+import { logoutAfterJWTExpiration } from "@/utils/JWTUtils";
 
 
 export const useUserStore = defineStore('user', {
@@ -43,10 +44,12 @@ export const useUserStore = defineStore('user', {
                 this.isLoggedIn = true;
                 /** Go to Home page. */
                 router.push("/");
+                logoutAfterJWTExpiration();
             })
             // .catch((error) => {
             //     console.log(error)
             // });
+            
         },
         logOut() {
             this.$reset();

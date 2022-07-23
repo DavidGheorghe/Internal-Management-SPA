@@ -1,6 +1,7 @@
 <script setup lang="ts">
 defineProps<{
-    label?: string
+    label?: string,
+    actionType: 'add' | 'delete' | 'edit'
 }>();
 defineEmits<{
     (e: 'click'): void
@@ -13,7 +14,7 @@ defineEmits<{
         class="add-button"
         @click="$emit('click')"
     >
-        <span class="material-symbols-outlined">add</span>
+        <span class="material-symbols-outlined">{{actionType}}</span>
         {{label}}
     </button>
 </template>

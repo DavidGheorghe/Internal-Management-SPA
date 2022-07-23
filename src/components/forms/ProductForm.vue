@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Product } from '@/Types/ProductTypes';
+import { Product } from '@/types/ProductTypes';
 import SearchSelect from '@/components/controls/SearchSelect.vue';
-import { SearchSelectOption } from '@/Types/GenericArrayType';
+import { SearchSelectOption } from '@/types/UtilsTypes';
 import { getProductCategoriesWithoutPagination } from '@/services/ProductCategoryService';
 import { computed, ref } from 'vue';
 import { useProductsStore } from '@/stores/ProductsStore';
@@ -24,15 +24,16 @@ const productsStore = useProductsStore();
 
 const categories = ref<SearchSelectOption[]>([]);
 const name = ref<string>(props.updatedProduct?.name || "");
-const height = ref<number>(props.updatedProduct?.productSizes.height || NaN);
-const diameter = ref<number>(props.updatedProduct?.productSizes.diameter || NaN);
-const weight = ref<number>(props.updatedProduct?.productSizes.weight || NaN);
-const priceWithoutVAT = ref<number>(props.updatedProduct?.productPrices.priceWithoutVAT || NaN);
-const productionCost = ref<number>(props.updatedProduct?.productPrices.productionCost || NaN);
-const categoryId = ref<number>(props.updatedProduct?.productCategory.id || NaN);
-const categoryFilterText = ref<string>(props.updatedProduct?.productCategory.categoryName ||"");
+const height = ref<number | null>(props.updatedProduct?.productSizes.height || null);
+const diameter = ref<number| null>(props.updatedProduct?.productSizes.diameter || null);
+const weight = ref<number | null>(props.updatedProduct?.productSizes.weight || null);
+const priceWithoutVAT = ref<number| null>(props.updatedProduct?.productPrices.priceWithoutVAT || null);
+const productionCost = ref<number | null>(props.updatedProduct?.productPrices.productionCost || null);
+const categoryId = ref<number| null>(props.updatedProduct?.productCategory.id || null);
+const categoryFilterText = ref<string>(props.updatedProduct?.productCategory.categoryName || "");
 
-const isSubmitButtonDisabled = computed(() => name.value !== "" && height.value !== 0 && diameter.value !== 0 && weight.value !== 0 && priceWithoutVAT.value !== 0 && productionCost.value !== 0 && categoryId.value !== 0);
+const isSubmitButtonDisabled = computed(() => name.value === "" && height.value === null && diameter.value === null 
+    && weight.value === null && priceWithoutVAT.value === null && productionCost.value === null && categoryFilterText.value === "");
 
 (await getProductsCategories());
 
@@ -47,7 +48,7 @@ async function getProductsCategories() {
     })
 }
 
-function getSelectedCategory(selectedCategory: SearchSelectOption) {
+function updateSelectedCategory(selectedCategory: SearchSelectOption) {
     categoryId.value = selectedCategory.id.valueOf();
 }
 
@@ -62,9 +63,9 @@ function saveProduct() {
         "productionCost": productionCost.value!
     }
     if (props.updatedProduct) {
-        // productsStore.updateProduct(props.updatedProduct.id, auxProduct);
+        productsStore.updateProduct(props.updatedProduct.id, auxProduct);
     } else {
-    //    productsStore.addProduct(auxProduct);
+        productsStore.addProduct(auxProduct);
     }
     emits('form-submitted');    
 }
@@ -72,11 +73,11 @@ function saveProduct() {
 function clearFields() {
     name.value = "";
     categoryFilterText.value = "";
-    height.value = NaN;
-    diameter.value = NaN;
-    weight.value = NaN;
-    priceWithoutVAT.value = NaN;
-    productionCost.value = NaN;
+    height.value = null;
+    diameter.value = null;
+    weight.value = null;
+    priceWithoutVAT.value = null;
+    productionCost.value = null;
 }
 </script>
 
@@ -90,14 +91,15 @@ function clearFields() {
                 label="Name"
                 :required="true"
                 v-model="name"
-            ></InputString>
+            />
             <SearchSelect
                 class="search-select"
                 :options="categories"
                 label="Select Category"
+                :required="true"
                 v-model="categoryFilterText"
-                @send-option="getSelectedCategory"
-            ></SearchSelect>
+                @send-option="updateSelectedCategory"
+            />
         </div>
         <div class="sizes-section">
             <span class="section-label">Sizes</span>
@@ -106,19 +108,19 @@ function clearFields() {
                 :required="true"
                 unit-measure="cm"
                 v-model="height"
-            ></InputNumber>
+            />
             <InputNumber
                 label="Diameter"
                 :required="true"
                 unit-measure="cm"
                 v-model="diameter"
-            ></InputNumber>
+            />
             <InputNumber
                 label="Weight"
                 :required="true"
                 unit-measure="g"
                 v-model="weight"
-            ></InputNumber>
+            />
         </div>
         <div class="prices-section">
             <span class="section-label">Prices</span>
@@ -127,34 +129,35 @@ function clearFields() {
                 :required="true"
                 unit-measure="RON"
                 v-model="productionCost"
-            ></InputNumber>
+            />
             <InputNumber
                 label="Price without V.A.T"
                 :required="true"
                 unit-measure="RON"
                 v-model="priceWithoutVAT"
-            ></InputNumber>
+            />
         </div>
         <div class="cancel-button-wrapper">
             <SimpleButton
                 class="cancel-button"
                 label="Cancel"
                 @click="router.back()"
-            ></SimpleButton>
+            />
         </div>
         <div class="add-button-wrapper">
             <SubmitButton
                 class="add-button"
                 label="Save"
+                :is-disabled="isSubmitButtonDisabled"
                 @submit="saveProduct"
-            ></SubmitButton>
+            />
         </div>
         <div class="clear-button-wrapper">
             <SimpleButton
                 class="clear-button"
                 label="Clear All"
                 @click="clearFields"
-            ></SimpleButton>
+            />
         </div>
     </form>
 </div>
@@ -229,6 +232,11 @@ form {
         border: 1px solid black;
         color: black;
     }
+    &:disabled {
+        border-color: transparent;
+        color: white;
+        opacity: 0.5;
+    }
 }
 .cancel-button-wrapper {
     position: absolute;
@@ -237,7 +245,7 @@ form {
 }
 
 .cancel-button {
-    background-color: #cbd5e1;
+    background-color: #a9b2bd;
     color: white;
     &:hover {
         border: 1px solid black;

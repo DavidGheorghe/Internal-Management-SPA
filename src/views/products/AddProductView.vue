@@ -29,11 +29,12 @@ function hideModal() {
         class="product-form"
         @form-submitted="displayModal"
     />
-    <Teleport v-if="isModalDisplayed" to="#modals">
-        <CustomModal @keydown.esc="hideModal">
-            <!-- <template v-slot:x-button class="modal-x-button">
-                <XButton @click="hideModal"/>
-            </template> -->
+    <Teleport to="#modals">
+        <CustomModal 
+                :display="isModalDisplayed"
+                @x-button-click="router.back"
+                @hidden-modal="router.back"
+            >
             <template v-slot:title>
                 <h2>Product added successfully!</h2>
             </template>

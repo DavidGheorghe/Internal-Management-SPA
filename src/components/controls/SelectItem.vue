@@ -17,27 +17,25 @@ function sendNewValue(newValue: string) {
 </script>
 
 <template>
-<div class="select-item-container">
-    <select 
-        
-        @change="sendNewValue(selectedOption)"
-        v-model="selectedOption"
-    >
-        <option 
-            :value="defaultOption" 
-            :selected="true" 
-            :disabled="true" 
-            :hidden="true"
-        >{{defaultOption}}</option>
-        <option 
-            
-            v-for="option in options" 
-            :value="option"
-            @click="sendNewValue(option)"
-        >{{option}}</option>
-    </select>
-    <!-- <span class="material-symbols-outlined expand-arrow">expand_more</span> -->
-</div>
+    <div class="select-item-container">
+        <select 
+            @change="sendNewValue(selectedOption)"
+            v-model="selectedOption"
+        >
+            <option 
+                :value="defaultOption" 
+                :selected="true" 
+                :disabled="true" 
+                :hidden="true"
+            >{{defaultOption}}</option>
+            <option 
+                v-for="option in options" 
+                :value="option"
+                @click="sendNewValue(option)"
+            >{{option}}</option>
+        </select>
+        <!-- <span class="material-symbols-outlined expand-arrow">expand_more</span> -->
+    </div>
 </template>
 
 <style lang="less" scoped>

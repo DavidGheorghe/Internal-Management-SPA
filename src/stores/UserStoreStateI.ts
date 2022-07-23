@@ -1,4 +1,4 @@
-import { Role } from '@/Types/Role';
+import { Role } from '@/types/Role';
 
 export interface UserStoreState {
     currentUserId: number | null,

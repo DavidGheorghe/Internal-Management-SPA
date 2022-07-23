@@ -2,6 +2,9 @@
 import { useUserStore } from '@/stores/UserStore';
 import { ref } from 'vue';
 
+const props = defineProps<{
+    display: boolean
+}>();
 
 const user = useUserStore();
 const isMouseOnContainer = ref(false);
@@ -20,7 +23,10 @@ function logOut() {
 </script>
 
 <template>
-<div @mouseenter="" class="account-actions-container">
+<div
+    v-if="display"
+    @mouseenter="" 
+    class="account-actions-container">
     <header>
         <span class="username">{{user.getCurrentUsername}}</span>
         <span class="roles">{{rolesStr}}</span>
