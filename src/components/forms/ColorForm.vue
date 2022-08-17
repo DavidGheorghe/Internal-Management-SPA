@@ -141,6 +141,7 @@ function clearFields() {
 </template>
 
 <style lang="less" scoped>
+@import "@/assets/colors.less";
 .color-form-container {
     height: 100%;
     width: 100%;
@@ -179,30 +180,36 @@ form {
     /* height: 10%; */
     position: absolute;
     bottom: 5%;
-    right: 5%;
+    right: 3%;
+}
+.clear-button, .cancel-button, .add-button {
+    width: 6rem;
+    height: 1.75rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    border: 1px solid black;
+    border-radius: 0.3rem;
+    &:hover {
+        box-shadow: inset .01rem .01rem 0rem .05rem black;
+    }
 }
 .add-button {
-    background-color: #22c55e;
-    color: white;
-    &:hover {
-        border: 1px solid black;
-        color: black;
-    }
+    background-color: @custom-green;
     &:disabled {
         border-color: transparent;
         color: white;
+        box-shadow: none;
         opacity: 0.5;
     }
 }
 .cancel-button-wrapper {
     position: absolute;
     bottom: 5%;
-    right: 15%;
+    right: 14.5%;
 }
 
 .cancel-button {
     background-color: #a9b2bd;
-    color: white;
     &:hover {
         border: 1px solid black;
         color: black;
@@ -214,8 +221,7 @@ form {
     left: 5%;
 }
 .clear-button {
-    background-color: #60a5fa;// rgb(185, 184, 184);
-    color: white;
+    background-color: @custom-blue;// rgb(185, 184, 184);
     &:hover {
         border: 1px solid black;
         color: black;

@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { fetchOrderById } from '@/services/OrderService';
-import OrderForm from '@/components/forms/OrderForm.vue';
+import OrderForm from '@/components/forms/order/OrderForm.vue';
 import CustomModal from '@/components/visual/CustomModal.vue';
 import SimpleButton from '@/components/buttons/SimpleButton.vue';
 
@@ -28,8 +28,9 @@ function hideModal() {
 
 <template>
     <div class="update-order-view">
-        <h3>Edit order <div class="order-id">#{{id}}</div></h3>
+        <h2>Edit order <span class="order-id">#{{id}}</span></h2>
         <OrderForm 
+            class="order-form"
             :edited-order="order"
             @form-submitted="displayModal"
         />
@@ -54,5 +55,23 @@ function hideModal() {
 </template>
 
 <style scoped lang="less">
-
+@import "@/assets/colors.less";
+.update-order-view {
+    background-color: #efefef;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+.order-form {
+    height: 80%;
+    width: 75%;
+}
+.order-id {
+    color: @custom-blue;
+}
+.ok-button {
+    background-color: @custom-green;
+}
 </style>

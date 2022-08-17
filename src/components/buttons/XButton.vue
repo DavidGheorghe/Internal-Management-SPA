@@ -6,13 +6,13 @@ defineEmits<{
 </script>
 
 <template>
-<button 
-    class="x-button"
-    type="button"
-    @click="$emit('click')"
->
-    <span class="material-symbols-outlined">close</span>
-</button>
+    <button 
+        class="x-button"
+        type="button"
+        @click="$emit('click')"
+    >
+        <span class="material-symbols-outlined">close</span>
+    </button>
 </template>
 
 <style lang="less" scoped>
@@ -28,5 +28,8 @@ button {
 
 .material-symbols-outlined {
     font-size: 24px;
+    &:hover {
+        font-weight: 600;
+    }
 }
 </style>

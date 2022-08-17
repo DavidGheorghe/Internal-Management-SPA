@@ -4,20 +4,13 @@ import { ref } from 'vue';
 const props = defineProps({
     width: Number,
     height: Number,
-    circular: {type: Boolean, default: false}
 });
 let imgPath = ref<string>();
-if (props.circular) {
-    imgPath.value = require("../../assets/logo-circular.png");
-} else {
-    imgPath.value = require("../../assets/logo.jpg");
-}
+imgPath.value = require("../../assets/logo.jpg");
 </script>
 
 <template>
-<div class="logo-container">
     <img class="logo" :src="imgPath" alt="">
-</div>
 </template>
 
 <style scoped>
@@ -27,7 +20,8 @@ if (props.circular) {
     max-width: 100%;
 }
 .logo {
-    height: 100%;
-    width: 100%;
+    /* height: 100%;
+    width: 100%; */
+    object-fit: cover;
 }
 </style>

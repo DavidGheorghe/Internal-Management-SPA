@@ -57,21 +57,48 @@ function deactivateLarge() {
 
 <template>
 <div class="density-options-container">
-    <span 
-        class="material-symbols-outlined" 
-        :class="{'activated': isSmallActive}"
-        @click="selectSmall"
-    >density_small</span>
-    <span 
-        class="material-symbols-outlined"
-        :class="{'activated': isMediumActive}"
-        @click="selectMedium"
-    >density_medium</span>
-    <span 
-        class="material-symbols-outlined" 
-        :class="{'activated': isLargeActive}"
-        @click="selectLarge"
-    >density_large</span>
+    <el-tooltip
+        class="box-item"
+        effect="dark"
+        content="15 items"
+        placement="top"
+    >
+        <span 
+            class="material-symbols-outlined" 
+            :class="{'activated': isSmallActive}"
+            @click="selectSmall"
+        >
+            density_small
+        </span>
+    </el-tooltip>
+    <el-tooltip
+        class="box-item"
+        effect="dark"
+        content="10 items"
+        placement="top"
+    >
+        <span 
+            class="material-symbols-outlined"
+            :class="{'activated': isMediumActive}"
+            @click="selectMedium"
+        >
+            density_medium
+        </span>
+    </el-tooltip>
+    <el-tooltip
+        class="box-item"
+        effect="dark"
+        content="5 items"
+        placement="top"
+    >
+        <span 
+            class="material-symbols-outlined" 
+            :class="{'activated': isLargeActive}"
+            @click="selectLarge"
+        >
+            density_large
+        </span>
+    </el-tooltip>
 </div>
 </template>
 
@@ -82,7 +109,6 @@ function deactivateLarge() {
     display: flex;
     height: 100%;
 }
-
 .material-symbols-outlined {
   font-variation-settings:
   'FILL' 0,
@@ -96,5 +122,8 @@ function deactivateLarge() {
 }
 .material-symbols-outlined.activated {
     background-color: rgba(182, 176, 176, 0.2);
+}
+.box-item {
+    font-family: inherit;
 }
 </style>

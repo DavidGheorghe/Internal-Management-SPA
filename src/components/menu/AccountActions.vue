@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/UserStore';
 import { ref } from 'vue';
+import ChangePasswordModal from '../visual/ChangePasswordModal.vue';
 
 const props = defineProps<{
     display: boolean
@@ -11,6 +12,9 @@ const isMouseOnContainer = ref(false);
 
 const rolesStr = user.currentUserRoles.join(', ');
 
+const isChangePasswordModalDisplayed = ref(false);
+
+
 const emits = defineEmits<{
     (e: 'mouseHovered', value: boolean): void,
     (e: 'logout'): void
@@ -20,31 +24,50 @@ function logOut() {
     emits('logout');
     user.logOut();
 }
+
+function displayChangePasswordModal() {
+    isChangePasswordModalDisplayed.value = true;
+}
+function hideChangePasswordModal() {
+    isChangePasswordModalDisplayed.value = false;
+}
 </script>
 
 <template>
-<div
-    v-if="display"
-    @mouseenter="" 
-    class="account-actions-container">
-    <header>
-        <span class="username">{{user.getCurrentUsername}}</span>
-        <span class="roles">{{rolesStr}}</span>
-    </header>
-    <div class="actions">
-        <button type="button" class="action">
-            <span>Change Password</span>
-        </button>
-        <button 
-            type="button" 
-            class="action logout"
-            @click="logOut"
-        >
-        <span class="material-symbols-outlined">logout</span>
-        Log Out
-        </button>
+    <div
+        v-if="display"
+        @mouseenter="" 
+        class="account-actions-container"
+    >
+        <header>
+            <span class="username">{{user.getCurrentUsername}}</span>
+            <span class="roles">{{rolesStr}}</span>
+        </header>
+        <div class="actions">
+            <button 
+                type="button" 
+                class="action change-password"
+                @click="displayChangePasswordModal"
+            >
+                <span class="material-symbols-outlined">key</span>
+                Change Password
+            </button>
+            <button 
+                type="button" 
+                class="action logout"
+                @click="logOut"
+            >
+                <span class="material-symbols-outlined">logout</span>
+                Log Out
+            </button>
+        </div>
     </div>
-</div>
+    <Teleport to="#modals">
+        <ChangePasswordModal 
+            :display="isChangePasswordModalDisplayed"
+            @hidden-modal="hideChangePasswordModal"
+        />
+    </Teleport>
 </template>
 
 <style lang="less" scoped>
@@ -70,8 +93,6 @@ function logOut() {
         background: #fafafa;
         transform: rotate(45deg);
     }
-
-    
 }
 header span {
     display: block;
@@ -118,24 +139,10 @@ main {
         color: black;
     }
 }
-// .action::after {
-//     content: "";
-//     position: relative;
-//     box-sizing: border-box;
-//     width: 70%;
-//     border-bottom: 1px solid rgb(206, 204, 204);
-// }
-.action.logout {
+.action.logout, .action.change-password  {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-}
-
-// .action:first-child::after {
-//     border-bottom: 0;
-// }
-
-.action.logout {
     cursor: pointer;
 }
 </style>

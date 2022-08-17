@@ -64,7 +64,7 @@ function selectOption(option: SearchSelectOption) {
             @focusin="displayOptions"
             @focusout="hideOptions" 
         >
-        <span class="material-symbols-outlined">expand_more</span>
+        <!-- <span class="material-symbols-outlined" @click="displayOptions">expand_more</span> -->
         <div  
             v-if="areOptionsDisplayed"
             class="options"
@@ -90,6 +90,7 @@ function selectOption(option: SearchSelectOption) {
 </template>
 
 <style lang="less" scoped>
+@import "@/assets/colors.less";
 
 input, label {
     all: unset;
@@ -145,10 +146,15 @@ label {
     position: relative;
     border: 1px solid #aba6a6;
     margin-top: 5px;
+    .active {
+        border-color: @custom-blue;
+    }
 }
 .search-bar {
     width: 100%;
     height: 100%;
+    text-overflow: ellipsis;
+    padding-left: 0.1rem;
     &:focus {
         border-color: black;
     }
@@ -160,7 +166,7 @@ label {
 .material-symbols-outlined {
     position: absolute;
     right: 0;
-    z-index: -1;
+    // z-index: -1;
     display: inline;
     cursor: pointer;
     height: 100%;

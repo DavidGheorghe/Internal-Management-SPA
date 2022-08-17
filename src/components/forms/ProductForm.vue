@@ -164,6 +164,8 @@ function clearFields() {
 </template>
 
 <style lang="less" scoped>
+@import "@/assets/colors.less";
+
 .product-form-container {
     height: 100%;
     width: 100%;
@@ -214,43 +216,39 @@ form {
     position: relative;
     padding: 5px 45px 5px 45px;
 }
-// .search-select {
-//     justify-content: center;
-//     align-items: center;
-//     position: relative;
-// }
 .add-button-wrapper {
-    /* height: 10%; */
     position: absolute;
     bottom: 5%;
     right: 5%;
 }
-.add-button {
-    background-color: #22c55e;
-    color: white;
+.clear-button, .cancel-button, .add-button {
+    width: 6rem;
+    height: 1.75rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    border: 1px solid black;
+    border-radius: 0.3rem;
     &:hover {
-        border: 1px solid black;
-        color: black;
+        box-shadow: inset .01rem .01rem 0rem .05rem black;
     }
+}
+.add-button {
+    background-color: @custom-green;
     &:disabled {
         border-color: transparent;
         color: white;
+        box-shadow: none;
         opacity: 0.5;
     }
 }
 .cancel-button-wrapper {
     position: absolute;
     bottom: 5%;
-    right: 15%;
+    right: 18%;
 }
 
 .cancel-button {
     background-color: #a9b2bd;
-    color: white;
-    &:hover {
-        border: 1px solid black;
-        color: black;
-    }
 }
 .clear-button-wrapper {
     position: absolute;
@@ -258,11 +256,7 @@ form {
     left: 5%;
 }
 .clear-button {
-    background-color: #60a5fa;// rgb(185, 184, 184);
-    color: white;
-    &:hover {
-        border: 1px solid black;
-        color: black;
-    }
+    background-color: @custom-blue;
 }
+
 </style>

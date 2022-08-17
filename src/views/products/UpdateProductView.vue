@@ -60,6 +60,8 @@ function hideModal() {
 </template>
 
 <style lang="less" scoped>
+@import "@/assets/colors.less";
+
 .update-product-view {
     height: calc(100% - 7vh);
     margin-top: 7vh;
@@ -75,7 +77,7 @@ function hideModal() {
 
 .product-name {
     display: inline;
-    color: #60a5fa;
+    color: @custom-blue;
 }
 
 .product-form {
@@ -87,7 +89,7 @@ function hideModal() {
 }
 
 .ok-button {
-    background-color: #22c55e;
+    background-color: @custom-green;
     color: white;
     &:hover {
         border: 1px solid black;

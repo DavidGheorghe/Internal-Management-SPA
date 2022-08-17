@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import router from '@/router';
+// import router from '@/router';
 import { useUserStore } from '@/stores/UserStore';
 import { ref } from 'vue';
 import Logo from '@/components/visual/Logo.vue';
 import AccountActions from '@/components/menu/AccountActions.vue';
+import { useRouter } from 'vue-router';
 
 const user = useUserStore();
+const router = useRouter();
 
 const areUserActionsDisplayed = ref(false);
 
@@ -35,44 +37,44 @@ function handleLogOut() {
     areUserActionsDisplayed.value = false;
     user.logOut();
 }
+
+function goToHome() {
+    router.push("/");
+}
 </script>
 
 <template>
-<div class="navbar-container">
-    <div class="logo-and-name">
-        <Logo 
-            :class="['logo']"
-            :circular="true"
-        ></Logo>
-        <div class="firm-name">
-            <span>Concrete</span>
-            <span>Concept</span>
+    <div class="navbar-container">
+        <div class="logo">
+            <Logo 
+                :class="['logo']"
+                @click="goToHome"
+            />
+        </div>
+        <div class="nav-bar-wrapper">
+            <nav class="nav-bar">
+                <router-link class="item" v-for="item in items" :key="item.path" :to="item.path" active-class="current-item">
+                    {{item.name}}
+                </router-link>
+            </nav>
+        </div>
+        <div class="account-actions">
+            <!-- TODO: use mouseenter and mouseleave events -->
+            <button 
+                class="material-symbols-outlined"
+                @click="toggleActions"
+            >account_circle
+            </button>
+            <Teleport
+                to="#account-actions"
+            >
+                <AccountActions
+                    :display="areUserActionsDisplayed"
+                    @logout="handleLogOut"
+                />
+            </Teleport>
         </div>
     </div>
-    <div class="nav-bar-wrapper">
-        <nav class="nav-bar">
-            <router-link class="item" v-for="item in items" :key="item.path" :to="item.path" active-class="current-item">
-                {{item.name}}
-            </router-link>
-        </nav>
-    </div>
-    <div class="account-actions">
-        <!-- TODO: use mouseenter and mouseleave events -->
-        <button 
-            class="material-symbols-outlined"
-            @click="toggleActions"
-        >account_circle
-        </button>
-        <Teleport
-            to="#account-actions"
-        >
-            <AccountActions
-                :display="areUserActionsDisplayed"
-                @logout="handleLogOut"
-            />
-        </Teleport>
-    </div>
-</div>
 </template>
 
 <style lang="less" scoped>
@@ -89,10 +91,11 @@ function handleLogOut() {
     flex-direction: row;
     border-bottom: 1px solid #cbcbcb;
     justify-content: center;
+    z-index: 99999;
 }
-.logo-and-name {
+.logo {
     position: absolute;
-    left: 0;
+    left: 0.2rem;
     display: flex;
     height: 100%;
 }
@@ -100,6 +103,9 @@ function handleLogOut() {
 .logo {
     height: 100%;
     width: 4vw;
+    &:hover {
+        cursor: pointer;
+    }
 }
 .nav-bar {
     display: flex;

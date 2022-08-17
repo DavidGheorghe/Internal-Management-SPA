@@ -69,4 +69,23 @@ export const statusesAsStrings: string[] = [
     OrderStatus[OrderStatus.SEALING],
     OrderStatus[OrderStatus.PACKING],
     OrderStatus[OrderStatus.READY],
+    OrderStatus[OrderStatus.COMPLETED],
 ]
+
+export function isStatusBefore(currentStatus: OrderStatus, status: OrderStatus) {
+    const comparisonResult = compareStatuses(currentStatus, status);
+    let isBefore: boolean = false;
+    if (comparisonResult === 1) {
+        isBefore = true;
+    }
+    return isBefore;
+}
+
+export function compareStatuses(firstStatus: OrderStatus, secondStatus: OrderStatus) {
+    if (firstStatus < secondStatus) {
+        return -1;
+    } else if (firstStatus > secondStatus) {
+        return 1;
+    }
+    return 0;
+}

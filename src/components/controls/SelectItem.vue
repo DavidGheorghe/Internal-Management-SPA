@@ -1,23 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps<{
     options: string[],
-    defaultOption?: string
+    defaultOption?: string,
+    modelValue: string
 }>();
 
 const selectedOption = ref(props.defaultOption ?? props.options[0]);
-const emits = defineEmits<{
-    (e: 'updateValue', value: string): void
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: string): void
 }>();
 
-function sendNewValue(newValue: string) {
-    emits('updateValue', newValue);
-}
+// function sendNewValue(newValue: string) {
+//     emits('updateValue', newValue);
+// }
+const currentOption = computed({
+    get() {
+        return props.modelValue;
+    },
+    set(value) {
+        if (value !== props.modelValue) {
+            emit('update:modelValue', value);
+        }
+    }
+})
 </script>
 
 <template>
-    <div class="select-item-container">
+    <!-- <div class="select-item-container">
         <select 
             @change="sendNewValue(selectedOption)"
             v-model="selectedOption"
@@ -34,8 +45,17 @@ function sendNewValue(newValue: string) {
                 @click="sendNewValue(option)"
             >{{option}}</option>
         </select>
-        <!-- <span class="material-symbols-outlined expand-arrow">expand_more</span> -->
-    </div>
+        <span class="material-symbols-outlined expand-arrow">expand_more</span>
+    </div> -->
+    <el-select 
+        v-model="currentOption"
+    >
+        <el-option 
+            v-for="option of options"
+            :key="option"
+            :value="option"
+        />
+    </el-select>
 </template>
 
 <style lang="less" scoped>

@@ -5,7 +5,6 @@ import { statusesAsStrings } from '@/utils/Utils';
 
 const props = defineProps<{
     status: OrderStatus,
-    // hasEditIcon?: boolean
 }>();
 
 const emit = defineEmits<{
@@ -29,44 +28,13 @@ const currentStatus = computed({
 </script>
 
 <template>
-    <div class="order-status-select-container">
-        <!-- <div class="select-wrapper"> -->
-            <select 
-                name="statuses-dropdown" 
-                id="statuses-dropdown"
-                v-model="currentStatus"
-            >
-                <option 
-                    v-for="status of statuses"
-                    :key="status"
-                    :value="status"
-                >
-                    {{status}}
-                </option>
-            </select>
-            <!-- <span 
-                v-if="hasEditIcon" 
-                class="material-symbols-outlined"
-            >
-                edit
-            </span> -->
-        <!-- </div> -->
-    </div>
+    <el-select 
+        v-model="currentStatus"
+    >
+        <el-option 
+            v-for="status of statuses"
+            :key="status"
+            :value="status"
+        />
+    </el-select>
 </template>
-
-<style scoped lang="less">
-// .order-status-select-container {
-//     display: flex;
-//     justify-content: flex-start;
-// }
-// .select-wrapper {
-//     display: flex;
-// }
-// select {
-//   -webkit-appearance: none;
-//   -moz-appearance: none;
-//   text-indent: 1px;
-//   text-overflow: '';
-//   border: none;
-// }
-</style>

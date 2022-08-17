@@ -53,6 +53,8 @@ const value = computed({
 </template>
 
 <style lang="less" scoped>
+@import "@/assets/colors.less";
+
 label, input {
     all: unset;
 }
@@ -74,7 +76,7 @@ input {
     width: 100%;
     height: 50%;
     &:focus {
-        border-bottom: 1px solid #22c55e;
+        border-bottom: 1px solid @custom-blue;
     }
 }
 

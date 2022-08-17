@@ -133,11 +133,14 @@ function sendNewPageNumber(page: number) {
 
 <style lang="less" scoped>
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0");
+@import "@/assets/colors.less";
+
 .pagination {
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
+    position: relative;
 }
 /* , .left-stepper-button, .right-stepper-button */ 
 .page {
@@ -154,7 +157,7 @@ function sendNewPageNumber(page: number) {
 }
 
 .page.current-page {
-    background-color: #22c55e; /*rgba(0, 0, 255, 0.7);*/
+    background-color: @custom-green; /*rgba(0, 0, 255, 0.7);*/
     border-radius: 10%;
     border: 1px solid black;
     color: white;

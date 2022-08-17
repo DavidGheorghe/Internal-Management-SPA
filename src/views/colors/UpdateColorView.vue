@@ -56,6 +56,7 @@ function hideModal() {
 </template>
 
 <style scoped lang="less">
+@import "@/assets/colors.less";
 .title {
     text-align: center;
     font-family: TimesNewRoman, "Times New Roman", Times;
@@ -76,6 +77,6 @@ function hideModal() {
 }
 .color-name {
     display: inline;
-    color: #60a5fa;
+    color: @custom-blue;
 }
 </style>

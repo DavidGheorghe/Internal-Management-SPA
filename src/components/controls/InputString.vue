@@ -41,10 +41,9 @@ const value = computed({
 
 <template>
     <div class="input-string-container">
-        <label for="input-string">{{finalLabel}}</label>
+        <label v-if="label">{{finalLabel}}</label>
         <input 
-            type="text"
-            id="input-string"
+            :type="type"
             :required="required"
             :placeholder="placeholder"
             v-model="value"
@@ -53,7 +52,7 @@ const value = computed({
 </template>
 
 <style lang="less" scoped>
-
+@import "@/assets/colors.less";
 .input-string-container {
     height: 50px;
     display: flex;
@@ -72,7 +71,7 @@ input {
     width: 100%;
     height: 50%;
     &:focus {
-        border-bottom: 1px solid #22c55e;
+        border-bottom: 1px solid @custom-blue;
     }
 }
 

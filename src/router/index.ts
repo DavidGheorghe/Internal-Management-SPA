@@ -15,8 +15,7 @@ import CustomersView from '@/views/customers/CustomersView.vue'
 import CustomersHomeView from '@/views/customers/CustomersHomeView.vue'
 import AddCustomerView from '@/views/customers/AddCustomerView.vue'
 import UsersView from '@/views/UsersView.vue'
-import CalculatorView from '@/views/CalculatorView.vue'
-import CategoriesView from '@/views/CategoriesView.vue'
+import ReportsView from '@/views/ReportsView.vue'
 import AddProductView from '@/views/products/AddProductView.vue'
 import UpdateProductView from '@/views/products/UpdateProductView.vue'
 import PageNotFoundView from '@/views/PageNotFoundView.vue'
@@ -159,17 +158,22 @@ const routes: Array<RouteRecordRaw> = [
 		]
 	},
 	{
+		path: '/reports',
+		name: 'Reports',
+		meta: {requiresAuthentication: true, isInNavbar: true},
+		component: ReportsView
+	},
+	{
 		path: '/users',
 		name: 'Users',
 		meta: {requiresAuthentication: true, isInNavbar: true},
 		component: UsersView
 	},
-	{
-		path: '/calculator',
-		name: 'Calculator',
-		meta: {requiresAuthentication: true, isInNavbar: true},
-		component: CalculatorView
-	},
+	// {
+	// 	path: '/loading',
+	// 	name: 'Loading',
+	// 	component: LoadingView
+	// },
 	{
 		path: '/:pathMatch(.*)*',
 		name: 'PageNotFound',
@@ -178,9 +182,22 @@ const routes: Array<RouteRecordRaw> = [
 ]
 
 
+
 const router = createRouter({
 	history: createWebHistory(process.env.BASE_URL),
 	routes
 })
+
+router.beforeEach((to, from) => {
+	const userStore = useUserStore();
+
+	if (to.meta.requiresAuthentication && userStore.isLoggedIn === false) {
+		return {
+			path: '/login',
+			query: { redirect: to.fullPath}
+		}
+	}
+});
+
 export default router
 

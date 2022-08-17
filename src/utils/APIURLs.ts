@@ -5,11 +5,12 @@ export class APIUrls {
 
     static readonly API_PRODUCTS_ROOT = APIUrls.BASE_URL + "/products";
     static readonly API_PRODUCT_CATEGORIES = APIUrls.BASE_URL + "/product-categories";
-    
     static readonly API_COLORS_ROOT = APIUrls.BASE_URL + "/colors";
-
     static readonly API_CUSTOMERS_ROOT = APIUrls.BASE_URL + "/customers";
     static readonly API_ORDERS_ROOT = APIUrls.BASE_URL + "/orders";
+    static readonly API_TODOS_ROOT = APIUrls.BASE_URL + "/todos";
+    static readonly API_CHANGE_PASSWORD = APIUrls.BASE_URL + "/me/change-password";
+
 }
 
 export function computePaginationPartFromFetchURL(pageNo?: number, pageSize?: number, sortBy?: string, sortDir?: string, hasQuestionMark?:boolean) {
@@ -42,7 +43,8 @@ export function computeURLWithId(rootURL: string, id: number) {
 export function computeFetchURL(api_root: string, pageNo?: number, pageSize?: number, sortBy?: string, sortDir?: string, searchText?: string) {
     let url = api_root;
     if (searchText) {
-        url += computeSearchURLWithPagination(searchText, pageNo, pageSize, sortBy, sortDir);
+        const trimmedText = searchText.trim();
+        url += computeSearchURLWithPagination(trimmedText, pageNo, pageSize, sortBy, sortDir);
     } else {
         url += computePaginationPartFromFetchURL(pageNo, pageSize, sortBy, sortDir, true);
     }

@@ -25,10 +25,10 @@ function sendClickEvent() {
 </template>
 
 <style lang="less" scoped>
-
+@import "@/assets/colors.less";
 .back-btn {
     all: unset;    
-    background-color: #22c55e;
+    background-color: @custom-green;
     padding: 5px;
     display: flex;
     justify-content: center;

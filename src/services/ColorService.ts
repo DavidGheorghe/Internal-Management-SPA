@@ -93,7 +93,7 @@ function computeFetchURL(numberOfPigments: number, pageNo?: number, pageSize?: n
     }
     url += "?"; 
     if (searchText) {
-        url += 'keyword=' + searchText + "&";
+        url += 'keyword=' + searchText.trim() + "&";
     } 
     if (pageNo !== undefined) {
         url += 'pageNo=' + pageNo;

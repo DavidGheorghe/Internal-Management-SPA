@@ -1,7 +1,8 @@
-import { Order, RetrievedOrderContentDTO } from "@/types/OrderTypes";
+import { Order, OrderStatus, RetrievedOrderContentDTO } from "@/types/OrderTypes";
 import { EntityData } from "@/types/UtilsTypes";
+import { def } from "@vue/shared";
 import { AxiosResponse } from "axios";
-import { APIUrls } from "./APIURLs";
+import { APIUrls, computePaginationPartFromFetchURL } from "./APIURLs";
 
 export function createOrdersDataFromResponse(response: AxiosResponse<any>) {
     const orderData = {} as EntityData<Order>;
@@ -19,15 +20,17 @@ export function createOrdersFromResponseData(response: AxiosResponse<any>): Orde
     const orders = [] as Order[];
     for (let i = 0; i < response.data.content.length; i++) {
         const order = {} as Order;
-        order.id = response.data.content[i].id;
-        order.customer = response.data.content[i].customer;
-        order.status = response.data.content[i].status;
-        order.details = response.data.content[i].details;
+        const currentOrder = response.data.content[i];
+        order.id = currentOrder.id;
+        order.customer = currentOrder.customer;
+        order.status = currentOrder.status;
+        order.details = currentOrder.details;
     
-        const dueDateInMills = Date.parse(response.data.content[i].dueDate);
+        const dueDateInMills = Date.parse(currentOrder.dueDate);
         order.dueDate = new Date(dueDateInMills);
-        const entryDateInMills = Date.parse(response.data.content[i].entryDate);
+        const entryDateInMills = Date.parse(currentOrder.entryDate);
         order.entryDate = new Date(entryDateInMills);
+        order.isPinned = currentOrder.pinned;
 
         orders.push(order);
     }
@@ -43,8 +46,28 @@ export function createOrderFromResponse(response: AxiosResponse<any>): Order {
     order.dueDate = response.data.dueDate;
     order.entryDate = response.data.entryDate;
     order.status = response.data.status;
+    order.isPinned = response.data.pinned;
 
     return order;
+}
+
+export function createOrdersFromResponse(response: AxiosResponse<any>): Order[] {
+    const orders: Order[] = [];
+    for (let i = 0; i < response.data.length; i++) {
+        const responseOrder = response.data[i];
+        const order = {} as Order;
+
+        order.id = responseOrder.id;
+        order.customer = responseOrder.customer;
+        order.details = responseOrder.details;
+        order.dueDate = responseOrder.dueDate;
+        order.isPinned = responseOrder.pinned;
+        order.status = responseOrder.status;
+        order.entryDate = responseOrder.entryDate;
+
+        orders.push(order);
+    }
+    return orders;
 }
 
 export function createOrderContentFromResponse(response: AxiosResponse<any>): RetrievedOrderContentDTO[] {
@@ -55,7 +78,8 @@ export function createOrderContentFromResponse(response: AxiosResponse<any>): Re
         item.product = response.data[i].product;
         item.color = response.data[i].color;
         item.quantity = response.data[i].quantity;
-
+        item.price = response.data[i].contentPrice;
+        
         content.push(item);
     }
     
@@ -64,4 +88,69 @@ export function createOrderContentFromResponse(response: AxiosResponse<any>): Re
 
 export function computeFetchContentURL(id: number): string {
     return APIUrls.API_ORDERS_ROOT + "/content/" + id;
+}
+
+export function computeStatusFromString(statusAsStr: string): number | undefined {
+    let status: OrderStatus | undefined;
+    switch (statusAsStr) {
+        case "NEW":
+            status = OrderStatus.NEW;
+            break;
+        case "POURING":
+            status = OrderStatus.POURING;
+            break;
+        case "DRYING":
+            status = OrderStatus.DRYING;
+            break;
+        case "SANDING":
+            status = OrderStatus.SANDING;
+            break;
+        case "SEALING":
+            status = OrderStatus.SEALING;
+            break;
+        case "PACKING":
+            status = OrderStatus.PACKING;
+            break;
+        case "READY":
+            status = OrderStatus.READY;
+            break;
+        case "COMPLETED":
+            status = OrderStatus.COMPLETED
+            break;
+        default:
+            status = undefined;
+    }
+    return status;
+}
+
+export function getIdFromStatus(status: OrderStatus): number {
+    const idAsStr = OrderStatus[status];
+    const id = Number.parseInt(idAsStr);
+    return id;
+}
+
+export function computeFetchURLFilteredByStatus(statusId: number, pageNo?: number, pageSize?: number, sortBy?: string, sortDir?: string, searchText?: string) {
+    let url = APIUrls.API_ORDERS_ROOT +"/status?keyword=" + searchText + "&statusId=" + statusId + "&" + computePaginationPartFromFetchURL(pageNo, pageSize, sortBy, sortDir, false);
+    return url;
+}
+
+export function formatDateAsString(date: Date) {
+    const dateInLocaleDateStr = date.toLocaleDateString();
+    const dates = dateInLocaleDateStr.split("/");
+    const finalDate = dates[2] + "-" + formatMonth(dates[0]) + "-" + formatDay(dates[1]);
+    return finalDate;
+}
+
+export function formatMonth(monthStr: string) {
+    if (monthStr.length === 1) {
+        return "0" + monthStr;
+    }
+    return monthStr;
+}
+
+export function formatDay(dayStr: string) {
+    if (dayStr.length === 1) {
+        return "0" + dayStr;
+    }
+    return dayStr;
 }

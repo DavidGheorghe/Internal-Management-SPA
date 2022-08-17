@@ -4,7 +4,11 @@ import { fetchAllColors } from '@/services/ColorService';
 import { SearchSelectOption } from '@/types/UtilsTypes';
 import { computed, ref, watch } from 'vue';
 import { OrderContentSearchSelectType } from '@/types/OrderTypes';
+import ActionButton from '../buttons/ActionButton.vue';
 
+defineProps<{
+    required: boolean
+}>();
 
 const emit = defineEmits<{
     (e: 'add-content', content: OrderContentSearchSelectType): void
@@ -150,97 +154,107 @@ watch(productSearchText, () => {
 </script>
 
 <template>
-    <div class="order-content-search-select-container">
-        <div class="inputs-wrapper">
-            <!-- <div class="product-input-wrapper"> -->
+    <div class="container">
+        <label>Choose content*</label>
+        <div class="order-content-search-select-container">
+            <div class="inputs-wrapper">
                 <input 
                     class="product-input"
                     type="text"
                     placeholder="Search Product"
                     v-model="productSearchText"
-                    :required="true"
+                    :required="required"
                     @focus="displayProductsOptions"
                     @blur="hideOptions"
                 >
-            <!-- </div> -->
-            <!-- <div class="color-input-wrapper"> -->
                 <input 
                     class="color-input"
                     type="text"
                     placeholder="Search Color"
                     v-model="colorSearchText"
-                    :required="true"
+                    :required="required"
                     @focus="displayColorsOptions"
                     @blur="hideOptions"
                 >
-            <!-- </div> -->
-            <!-- <div class="quantity-input-wrapper"> -->
                 <input
                     class="quantity-input"
                     type="number"
                     placeholder="Amount"
                     v-model="quantity"
-                    :required="true"
+                    :required="required"
                     @focus="handleQuantityInput"
                 >
-            <!-- </div> -->
-            <div 
-                v-if="areOptionsDisplayed"
-                class="options-wrapper"
-                @mouseenter="isCursorOverOptions = true"
-                @mouseleave="isCursorOverOptions = false"
-            >
-                <div
-                    v-if="filteredOptions.length > 0"
-                    id="option"
-                    v-for="option in filteredOptions" 
-                    :key="option.id.valueOf()"
-                    @click="selectOption(option)"
+                <div 
+                    v-if="areOptionsDisplayed"
+                    class="options-wrapper"
+                    @mouseenter="isCursorOverOptions = true"
+                    @mouseleave="isCursorOverOptions = false"
                 >
-                    {{option.value}}
-                </div>
-                <div
-                    v-else
-                    class="empty-options">
-                    <span>No Results.</span>
+                    <div
+                        v-if="filteredOptions.length > 0"
+                        id="option"
+                        v-for="option in filteredOptions" 
+                        :key="option.id.valueOf()"
+                        @click="selectOption(option)"
+                    >
+                        {{option.value}}
+                    </div>
+                    <div
+                        v-else
+                        class="empty-options">
+                        <span>No Results.</span>
+                    </div>
                 </div>
             </div>
-            <button 
-                type="button"
+            <ActionButton 
+                class="clear-content-button"
+                action-type="close"
                 @click="clearFields"
-            >
-                Clear
-            </button>
-            <div class="add-content-button-wrapper">
-                <button
-                    type="button"
-                    @click="sendContent"
-                >Add</button>
-            </div>
+            />
+            <ActionButton 
+                class="add-content-button"
+                action-type="add"
+                @click="sendContent"
+            />
         </div>
-        
     </div>
 </template>
 
 <style scoped lang="less">
+@import "@/assets/colors.less";
+
+.container {
+    display: flex;
+    flex-direction: column;
+    padding-top: 5px;
+}
+label {
+    all: unset;
+    width: 100%;
+    text-align: start;
+    font-family: 'Segoe UI', serif;
+    font-weight: 600;
+}
 .order-content-search-select-container {
     display: flex;
     position: relative;
+    box-sizing: border-box;
+    height: 24px;
+    margin-top: 5px;
 }
 input {
     all: unset;
-    border: 1px solid black;
+    border: 1px solid grey;
+    height: 100%;
+    box-sizing: border-box;
+    text-overflow: ellipsis;
+    padding-left: 0.1rem;
+    &:focus {
+        border-color: @custom-blue;
+    }
 }
 .inputs-wrapper {
-    position: relative;
-}
-.search-select-container {
-    padding: 5px 45px 5px 45px;
-    height: 50px;
-    display: flex;
-    flex-direction: column;    
-    justify-content: center;
-    align-items: center;
+    box-sizing: border-box;
     position: relative;
 }
 #option {
@@ -279,30 +293,24 @@ label {
     font-family: 'Segoe UI', serif;
     font-weight: 600;
 }
-.input-container {
-    height: 50%;
-    width: 100%;
-    position: relative;
-    border: 1px solid #aba6a6;
-    margin-top: 5px;
-}
-.search-bar {
-    width: 100%;
-    height: 100%;
-    &:focus {
-        border-color: black;
-    }
-}
 #search-select::-webkit-search-cancel-button {
     position: relative;
     margin-right: 20px;
 }
-.material-symbols-outlined {
-    position: absolute;
-    right: 0;
-    z-index: -1;
-    display: inline;
-    cursor: pointer;
+.clear-content-button, .add-content-button {
+    border: 1px solid grey;
     height: 100%;
+}
+.clear-content-button, .add-content-button {
+    border-radius: 0;
+    &:hover {
+        box-shadow: none;
+    }
+}
+.clear-content-button {
+    background-color: @custom-blue;
+}
+.add-content-button {
+    background-color: @custom-green;
 }
 </style>

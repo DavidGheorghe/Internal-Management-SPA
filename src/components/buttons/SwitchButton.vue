@@ -54,6 +54,7 @@ function toggleOptionsFlags() {
 </template>
 
 <style lang="less" scoped>
+@import "@/assets/colors.less";
 .switch-button-container {
     box-sizing: border-box;
     display: grid;
@@ -82,7 +83,7 @@ function toggleOptionsFlags() {
 }
 
 .option.active {
-    background-color: #22c55e;//#77b994;
+    background-color: @custom-green;//#77b994;
     color: white;
     border: 1px solid black;
     cursor: default;

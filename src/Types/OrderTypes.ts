@@ -9,7 +9,18 @@ export type Order = {
     details: string,
     dueDate: Date,
     entryDate: Date,
-    customer: Customer
+    customer: Customer,
+    isPinned: Boolean
+}
+export type DashboardOrder = {
+    id: number,
+    status: OrderStatus,
+    details: string,
+    dueDate: Date,
+    entryDate: Date,
+    customer: Customer,
+    isPinned: Boolean,
+    isFocused: Boolean
 }
 
 export enum OrderStatus {
@@ -19,14 +30,16 @@ export enum OrderStatus {
 	SANDING = 4,
 	SEALING = 5,
 	PACKING = 6,
-	READY = 7
+	READY = 7,
+    COMPLETED = 8
 }
 
 export type RetrievedOrderContentDTO = {
     id: number,
     color: Color,
     product: Product,
-    quantity: number
+    quantity: number,
+    price: number
 }
 
 export type OrderDTO = {

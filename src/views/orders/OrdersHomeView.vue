@@ -1,37 +1,58 @@
 <script setup lang="ts">
-import { deleteOrderById, fetchOrders } from '@/services/OrderService';
+import { deleteOrderById, fetchOrders, fetchOrdersByStatus } from '@/services/OrderService';
 import { Order } from '@/types/OrderTypes';
 import { EntityData, PaginationParams } from '@/types/UtilsTypes';
 import paginationParamsDefaults from "@/utils/PaginationParamsDefaults";
-import { ref, watch, watchEffect } from 'vue';
+import { reactive, ref, watch, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
-import OrderCard from '@/components/visual/OrderCard.vue';
+import OrderCard from '@/components/visual/order/OrderCard.vue';
 import SearchBar from '@/components/controls/SearchBar.vue';
 import Pagination from '@/components/controls/Pagination.vue';
 import ActionButton from '@/components/buttons/ActionButton.vue';
 import CustomModal from '@/components/visual/CustomModal.vue';
 import SimpleButton from '@/components/buttons/SimpleButton.vue';
-import OrderStatusSelect from '@/components/controls/OrderStatusSelect.vue';
+import SelectItem from '@/components/controls/SelectItem.vue';
+import { statusesAsStrings } from '@/utils/Utils';
+import { computeStatusFromString, getIdFromStatus } from '@/utils/OrderServiceUtils';
 
 const router = useRouter();
 
-const paginationParams = ref<PaginationParams>(paginationParamsDefaults);
-paginationParams.value.sortBy = "dueDate";
-paginationParams.value.sortDir = "desc";
+const paginationParams = reactive<PaginationParams>({...paginationParamsDefaults});
+
+paginationParams.sortBy = "dueDate";
+paginationParams.sortDir = "desc";
+paginationParams.pageSize = 6;
 
 const ordersData = ref<EntityData<Order>>();
 const searchText = ref("");
 const isDeleteModalDisplayed = ref(false);
 const orderToBeDeleted = ref<Order>();
 
+const statusFilterOptions = ["ALL", ...statusesAsStrings];
+const currentStatusFilter = ref("ALL");
+
 (await initOrdersData());
 
 async function initOrdersData() {
-    ordersData.value = (await fetchOrders(paginationParams.value.pageNo, paginationParams.value.pageSize, paginationParams.value.sortBy, paginationParams.value.sortDir, searchText.value));
+    ordersData.value = (await fetchOrders(paginationParams.pageNo, paginationParams.pageSize, paginationParams.sortBy, paginationParams.sortDir, searchText.value));
 }
 
 function updatePageNumber(newPageNumber: number) {
-    paginationParams.value.pageNo = newPageNumber - 1; // substract 1 because the page number on server side is 0 index based.
+    paginationParams.pageNo = newPageNumber - 1; // substract 1 because the page number on server side is 0 index based.
+}
+
+async function updateStatusFilter(newFilter: string) {
+    if (newFilter === "All") {
+        await initOrdersData();
+    } else {
+        const newStatusFilter = computeStatusFromString(newFilter);
+        const newStatusFilterId = getIdFromStatus(newStatusFilter!);
+        ordersData.value = (await fetchOrdersByStatus(newStatusFilter!, paginationParams.pageNo, paginationParams.pageSize, paginationParams.sortBy, paginationParams.sortDir, searchText.value))
+    }
+}
+
+function updateSortDir() {
+
 }
 
 function goToAddPage() {
@@ -56,6 +77,16 @@ function hideDeleteModal() {
     isDeleteModalDisplayed.value = false;
 }
 
+watch(currentStatusFilter, async (newFilter, oldFilter) => {
+    if (newFilter === "ALL") {
+        await initOrdersData();
+    } else {
+        const newStatusFilter = computeStatusFromString(newFilter);
+        const newStatusFilterId = getIdFromStatus(newStatusFilter!);
+        ordersData.value = (await fetchOrdersByStatus(newStatusFilter!, paginationParams.pageNo, paginationParams.pageSize, paginationParams.sortBy, paginationParams.sortDir, searchText.value))
+    }
+})
+
 watchEffect(() => {
     initOrdersData();
 })
@@ -63,46 +94,60 @@ watchEffect(() => {
 
 <template>
     <div class="order-home">
-        <h3>Orders page</h3>
-        <div class="controls-container">
-
-        <SearchBar
-            v-model="searchText"
-        />
-        <!-- <div class="add-order-button"> -->
-        <ActionButton
-            action-type="add"
-            label="Add Order"
-            @click="goToAddPage"
-        />
-        <!-- <OrderStatusSelect /> -->
-        <!-- </div> -->
-        </div>
-        <div 
-            class="orders-cards"
-            v-for="order in ordersData?.content"
-            :key="order.id"
-        >
-            <OrderCard 
-                :order="order" 
-                @delete-order="showDeleteModal(order)"
+        <main class="content">
+            <div class="controls-container">
+            <SearchBar
+                class="search-bar"
+                v-model="searchText"
+                placeholder="Search by customer"
             />
-        </div>
-        <Pagination
-            :last="ordersData!.last"
-            :page-no="ordersData!.pageNo"
-            :page-size="ordersData!.pageSize"
-            :total-elements="ordersData!.totalElements"
-            :total-pages="ordersData!.totalPages"
-            @update-page="updatePageNumber"
-        />
-        <Teleport to="#modals">
+            <SelectItem 
+                v-model="currentStatusFilter"
+                class="select-item"
+                :options="statusFilterOptions"
+            />
+            <ActionButton
+                class="add-button"
+                action-type="add"
+                label="Add Order"
+                @click="goToAddPage"
+            />
+            </div>
+            <div class="orders-wrapper">
+                <el-scrollbar always>
+                    <div 
+                        class="orders-cards"
+                    >
+                        <OrderCard 
+                            v-for="order in ordersData?.content"
+                            :key="order.id"
+                            :order="order" 
+                            @delete-order="showDeleteModal(order)"
+                        />
+                    </div>
+                </el-scrollbar>
+            </div>
+            <Pagination
+                :last="ordersData!.last"
+                :page-no="ordersData!.pageNo"
+                :page-size="ordersData!.pageSize"
+                :total-elements="ordersData!.totalElements"
+                :total-pages="ordersData!.totalPages"
+                @update-page="updatePageNumber"
+            />
+        </main>
+        <Teleport to="#modals"> 
             <CustomModal 
-            :display="isDeleteModalDisplayed"
-            @x-button-click="hideDeleteModal"
-        >
+                :display="isDeleteModalDisplayed"
+                @x-button-click="hideDeleteModal"
+            >
                 <template #title>
-                    <h2>Delete order #{{orderToBeDeleted?.id}} for customer {{orderToBeDeleted?.customer.companyName}} ?</h2>
+                    <h2>Delete order
+                        <span class="modal-title-order-id">#{{orderToBeDeleted?.id}}</span> 
+                        for customer 
+                        <span class="modal-title-order-customer">{{orderToBeDeleted?.customer.companyName}}</span>  
+                        ?
+                    </h2>
                 </template>
                 <template #cancel-button>
                     <SimpleButton 
@@ -124,7 +169,76 @@ watchEffect(() => {
 </template>
 
 <style scoped lang="less">
+@import "@/assets/colors.less";
+
 .order-home {
+    overflow-x: hidden;
+    width: 100%;
+    background-color: @pages-background;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.content {
+    width: 95rem;
+    height: 40rem;
+    display: grid;
+    grid-template-rows: 5rem 30rem 5rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    margin-top: 5rem;
+    box-shadow: 2px 2px 2px 2px #959da0;
+}
+.controls-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: 30rem 10rem;
+    margin-left: 3.1rem;
+    & .search-bar {
+        width: 25.3rem;
+        height: 2rem;
+        align-self: center;
+        justify-self: start;
+    }
+    & .add-button {
+        position: absolute;
+        right: 3.1rem;
+        width: 8rem;
+        height: 2rem;
+        align-self: center;
+        justify-self: start;
+        background-color: @custom-green;
+    }
+    & .select-item {
+        align-self: center;
+        justify-self: start;
+        margin-left: 1.5rem;
+    }
+}
+.orders-cards {
     overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: max-content auto;
+    align-items: center;
+    justify-items: center;
+}
+.ok-button {
+    width: 5rem;
+    height: 2rem;
+    background-color: #1e3a8a;
+    font-weight: 600;
+    &:hover {
+        background-color: #2563eb;
+    }
+}
+.no-button {
+    background-color: @custom-green;
+    width: 5rem;
+    height: 2rem;
+    font-weight: 600;
+}
+.modal-title-order-customer, .modal-title-order-id {
+    color: @custom-blue;
 }
 </style>

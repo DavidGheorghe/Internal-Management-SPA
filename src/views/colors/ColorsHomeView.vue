@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from 'vue';
+import { computed, reactive, ref, watch, watchEffect } from 'vue';
 import { EntityData, PaginationParams } from '@/types/UtilsTypes';
 import { SizeType } from '@/utils/Utils';
 import { Color } from "@/types/ColorTypes";
@@ -17,8 +17,8 @@ import Pagination from '@/components/controls/Pagination.vue';
 const router = useRouter();
 
 /* Variables declaration. */
-const paginationParams = ref<PaginationParams>(paginationParamsDefaults);
-paginationParams.value.sortBy = "name";
+const paginationParams = reactive<PaginationParams>({...paginationParamsDefaults});
+paginationParams.sortBy = "name";
 // const pageNo = ref(0);
 // const pageSize = ref(15);
 // const sortBy = ref("name");
@@ -48,27 +48,27 @@ const colorsData = ref<EntityData<Color>>();
 (await updateColorsData());
 
 async function updateColorsData() {
-    colorsData.value = (await fetchColors(currentNumberOfPigments.value, paginationParams.value.pageNo, paginationParams.value.pageSize, paginationParams.value.sortBy, paginationParams.value.sortDir, searchText.value));
+    colorsData.value = (await fetchColors(currentNumberOfPigments.value, paginationParams.pageNo, paginationParams.pageSize, paginationParams.sortBy, paginationParams.sortDir, searchText.value));
 }
 
 function updatePageSize(sizeOption: SizeType) {
     switch (sizeOption) {
         case SizeType.SMALL:
-            paginationParams.value.pageSize = 15;
+            paginationParams.pageSize = 15;
             break;
         case SizeType.MEDIUM:
-            paginationParams.value.pageSize = 10;
+            paginationParams.pageSize = 10;
             break;
         case SizeType.LARGE:
-            paginationParams.value.pageSize = 5;
+            paginationParams.pageSize = 5;
             break;
         default:
-            paginationParams.value.pageSize = 15;
+            paginationParams.pageSize = 15;
     }
 }
 
 function updatePageNumber(newPageNumber: number) {
-    paginationParams.value.pageNo = newPageNumber - 1; // substract 1 because the page number on server side is 0 index based.
+    paginationParams.pageNo = newPageNumber - 1; // substract 1 because the page number on server side is 0 index based.
 }
 
 function goToAddPage() {
@@ -122,6 +122,7 @@ watch(currentPigmentOption, async (newOption, oldOption) => {
             <SearchBar
                 class="search-bar"
                 v-model="searchText"
+                placeholder="Search by name"
             />
             <PageSizeIconsOptions
                 class="select-page-size"
@@ -206,7 +207,7 @@ watch(currentPigmentOption, async (newOption, oldOption) => {
                 @x-button-click="hideDeleteModal"
             >
                 <template #title>
-                    <h2>Delete color <div class="deleted-color-name">{{deletedColorName}}</div>?</h2>
+                    <h2>Delete color <span class="deleted-color-name">{{deletedColorName}}</span>?</h2>
                 </template>
                 <template #cancel-button>
                     <SimpleButton 
@@ -230,6 +231,7 @@ watch(currentPigmentOption, async (newOption, oldOption) => {
 
 <style lang="less" scoped>
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0");
+@import "@/assets/colors.less";
 
 .colors-home {
     width: 100%;
@@ -270,9 +272,12 @@ watch(currentPigmentOption, async (newOption, oldOption) => {
     height: 35%;
 }
 .add-button {
-    background-color: #22c55e;//#77b994;
-    color: white;
+    background-color: @custom-green;//#77b994;
+    // color: white;
     height: 40%;
+    // &:hover {
+    //     color: white;
+    // }
 }
 
 table {
@@ -290,7 +295,7 @@ table {
 }
 
 thead {
-    background-color: #22c55e;//#77b994;
+    background-color: @custom-green;//#77b994;
     color: black;
 }
 
@@ -335,13 +340,11 @@ tbody tr {
 tbody tr:nth-child(odd) {
     background-color: #efefef;
 }
-
 .numerical-cell-header {
     width: 7%;
     line-break: normal;
     font-size: 1rem;
 }
-
 .numerical-cell {
     text-align: right;
     font-variant-numeric: proportional-nums;
@@ -353,7 +356,6 @@ tbody tr:nth-child(odd) {
         align-items: center;
     }
 }
-
 .material-symbols-outlined {
     font-variation-settings:
     'FILL' 0,
@@ -368,5 +370,23 @@ tbody tr:nth-child(odd) {
     &.delete {
         color: #dc2626;
     }
+}
+.deleted-color-name {
+    color: @custom-blue;
+}
+.ok-button {
+    width: 5rem;
+    height: 2rem;
+    background-color: #1e3a8a;
+    font-weight: 600;
+    &:hover {
+        background-color: #2563eb;
+    }
+}
+.no-button {
+    background-color: @custom-green;
+    width: 5rem;
+    height: 2rem;
+    font-weight: 600;
 }
 </style>

@@ -10,25 +10,30 @@ defineEmits<{
 </script>
 
 <template>
-<button type="button" @click="$emit('click')">
-    {{label}}
-</button>
+    <button type="button" @click="$emit('click')">
+        {{label}}
+    </button>
 </template>
 
 <style lang="less" scoped>
 button {
     all: unset;
-    // background-color: #60a5fa;// rgb(185, 184, 184);
-    // color: white;
+    box-sizing: border-box;
     width: 60px;
-    height: 20px;
-    padding: 2px 4px 2px 2px;// 10%;
     text-align: center;
-    border: 1px solid transparent;
-    cursor: pointer;
-    // &:hover {
-    //     border: 1px solid black;
-    //     color: black;
-    // }
+    border: 1px solid black;
+    border-radius: 0.2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 500;
+    &:hover {
+        box-shadow: inset .01rem .01rem 0rem .05rem black;
+        cursor: pointer;
+    }
+    &:disabled {
+        border-color: transparent;
+        box-shadow: none;
+        color: white;
+        opacity: 0.5;
+    }
 }
 </style>

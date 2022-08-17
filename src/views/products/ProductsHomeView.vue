@@ -23,12 +23,15 @@ const router = useRouter();
 
 const showSizes = ref(true);
 const categoryFilterId = ref(-1);
+const currentCategory = ref("All");
 
 const productToBeDeletedId = ref<number>();
 const productToBeDeletedName = ref<string>();
 const isDeleteModalDisplayed = ref(false);
-const paginationParams = reactive<PaginationParams>(paginationParamsDefaults);
+
+const paginationParams = reactive<PaginationParams>({...paginationParamsDefaults});
 paginationParams.pageSize = 15;
+
 const searchText = ref("");
 
 const getProductsURL = computed(() => {
@@ -39,7 +42,7 @@ const getProductsURL = computed(() => {
             url += "keyword=" + searchText.value + "&";
         }
         url += "pageNo=" + paginationParams.pageNo + "&pageSize=" + paginationParams.pageSize + "&sortBy=" + paginationParams.sortBy + "&sortDir=" + paginationParams.sortDir;
-    } else if (searchText.value !== "") {
+    } else if (searchText.value.trim() !== "") {
         url = APIUrls.API_PRODUCTS_ROOT + "/search?keyword=" + searchText.value + "&pageNo=" + paginationParams.pageNo + "&pageSize=" + paginationParams.pageSize + "&sortBy=" + paginationParams.sortBy + "&sortDir=" + paginationParams.sortDir;    
     }
     return url;
@@ -147,6 +150,15 @@ function hideDeleteModal() {
     isDeleteModalDisplayed.value = false;
 }
 
+watch(currentCategory, async (newCategory) => {
+    if (newCategory === "All") {
+        categoryFilterId.value = -1;
+    } else {
+        const categoryId = (await productsStore.getCategoryIdFromName(newCategory));
+        categoryFilterId.value = categoryId;
+    }
+})
+
 /** Update the products data, and page numbers, every time pageNo, pageSize, sortDir, sortBy variables modifies. */
 watch(getProductsURL, async () => {
     updateProductsData();
@@ -161,12 +173,12 @@ watch(getProductsURL, async () => {
                 <SearchBar 
                     class="search-bar"
                     v-model="searchText"
+                    placeholder="Search by name"
                 />
                 <SelectItem
                     class="select-product-category"
+                    v-model="currentCategory"
                     :options=productsCategories
-                    :default-option="'Choose Category'"
-                    @update-value="updateCategoryFilter"
                 />
                 <SwitchButton
                     class="switch-sizes-prices-button"
@@ -282,6 +294,7 @@ watch(getProductsURL, async () => {
 
 <style scoped lang="less">
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0");
+@import "@/assets/colors.less";
 
 .products-home {
     height: 100%;
@@ -324,6 +337,7 @@ main {
 
 .search-bar {
     margin-left: 1%;
+    margin-top: 1rem;
     width: 50%;
     height: 50%;
 }
@@ -341,8 +355,8 @@ main {
 }
 
 .add-button {
-    background-color: #22c55e;//#77b994;
-    color: white;
+    background-color: @custom-green;//#77b994;
+    // color: white;
     height: 40%;
 }
 
@@ -361,7 +375,7 @@ table {
 }
 
 thead {
-    background-color: #22c55e;//#77b994;
+    background-color: @custom-green;//#77b994;
     color: black;
 }
 
@@ -398,7 +412,6 @@ td {
         padding-left: 1%;
     }
 }
-
 tbody tr {
     border-bottom: 1px solid rgb(215, 209, 209);
 }
@@ -406,7 +419,6 @@ tbody tr {
 tbody tr:nth-child(odd) {
     background-color: #efefef;
 }
-
 .numerical-cell-header {
     width: 7%;
     line-break: normal;
@@ -415,7 +427,6 @@ tbody tr:nth-child(odd) {
         font-size: 0.95rem;
     }
 }
-
 .numerical-cell {
     text-align: right;
     font-variant-numeric: proportional-nums;
@@ -455,6 +466,21 @@ tbody tr:nth-child(odd) {
 
 .deleted-product-name {
     display: inline;
-    color: #60a5fa;
+    color: @custom-blue;
+}
+.ok-button {
+    width: 5rem;
+    height: 2rem;
+    background-color: #1e3a8a;
+    font-weight: 600;
+    &:hover {
+        background-color: #2563eb;
+    }
+}
+.no-button {
+    background-color: @custom-green;
+    width: 5rem;
+    height: 2rem;
+    font-weight: 600;
 }
 </style>

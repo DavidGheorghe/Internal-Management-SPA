@@ -1,7 +1,8 @@
 <script setup lang="ts">
 defineProps<{
     label?: string,
-    actionType: 'add' | 'delete' | 'edit'
+    actionType: 'add' | 'delete' | 'edit' | 'close' | 'done',
+    disabled?: boolean
 }>();
 defineEmits<{
     (e: 'click'): void
@@ -11,7 +12,8 @@ defineEmits<{
 <template>
     <button 
         type="button"
-        class="add-button"
+        class="action-button"
+        :disabled="disabled"
         @click="$emit('click')"
     >
         <span class="material-symbols-outlined">{{actionType}}</span>
@@ -22,20 +24,29 @@ defineEmits<{
 <style lang="less" scoped>
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0");
 
-.add-button {
+.action-button {
+    box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 0;
     padding: 2px 4px 2px 2px;
-    font-size: 16px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    // font-family: 'Open Sans', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     height: 100%;
-    cursor: pointer;
-    border: 1px solid transparent;
+    border: 1px solid black;
+    border-radius: 0.2rem;
     &:hover {
-        // background-color: rgb(160, 154, 154);
+        box-shadow: inset .01rem .01rem 0rem .05rem black;
         color: rgba(0, 0, 0, 0.9);
-        border: 1px solid black;
+        cursor: pointer;
+    }
+    &:disabled {
+        border: inherit;
+        color: inherit;
+        cursor: default !important;
+        opacity: 0.6;
     }
 }
 
@@ -46,6 +57,6 @@ defineEmits<{
   'GRAD' 0,
   'opsz' 48;
   font-size: 24px;
-  cursor: pointer;
 }
+
 </style>
