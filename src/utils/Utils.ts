@@ -69,7 +69,7 @@ export const statusesAsStrings: string[] = [
     OrderStatus[OrderStatus.SEALING],
     OrderStatus[OrderStatus.PACKING],
     OrderStatus[OrderStatus.READY],
-    OrderStatus[OrderStatus.COMPLETED],
+    OrderStatus[OrderStatus.COMPLETE],
 ]
 
 export function isStatusBefore(currentStatus: OrderStatus, status: OrderStatus) {
@@ -88,4 +88,27 @@ export function compareStatuses(firstStatus: OrderStatus, secondStatus: OrderSta
         return 1;
     }
     return 0;
+}
+
+export const lastEightWeeksDatesStr = {
+    eightWeeksAgo: computeDateStringForWeeksAgo(8, 7),
+    sevenWeeksAgo: computeDateStringForWeeksAgo(7, 6),
+    sixWeeksAgo: computeDateStringForWeeksAgo(6, 5),
+    fiveWeeksAgo: computeDateStringForWeeksAgo(5, 4),
+    fourWeeksAgo: computeDateStringForWeeksAgo(4, 3),
+    threeWeeksAgo: computeDateStringForWeeksAgo(3, 2),
+    twoWeeksAgo: computeDateStringForWeeksAgo(2, 1),
+    oneWeeksAgo: computeDateStringForWeeksAgo(1, 0),
+}
+
+function computeDateStringForWeeksAgo(week1: number, week2: number) {
+    const week1Date = substractDays(week1 * 7);
+    const week2Date = substractDays(week2 * 7 + 1);
+    const week1Str = week1Date.toLocaleDateString("ro-RO", {month: 'numeric', day: 'numeric'});
+    const week2Str = week2Date.toLocaleDateString("ro-RO", {month: 'numeric', day: 'numeric'});
+    return week1Str + " - " + week2Str;
+}
+
+function substractDays(numberOfDays: number) {
+    return new Date(new Date().setDate(new Date().getDate() - numberOfDays));
 }

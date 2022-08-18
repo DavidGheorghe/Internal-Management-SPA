@@ -8,6 +8,8 @@ export class APIUrls {
     static readonly API_COLORS_ROOT = APIUrls.BASE_URL + "/colors";
     static readonly API_CUSTOMERS_ROOT = APIUrls.BASE_URL + "/customers";
     static readonly API_ORDERS_ROOT = APIUrls.BASE_URL + "/orders";
+    static readonly API_ORDERS_REPORTS = APIUrls.API_ORDERS_ROOT + "/reports";
+
     static readonly API_TODOS_ROOT = APIUrls.BASE_URL + "/todos";
     static readonly API_CHANGE_PASSWORD = APIUrls.BASE_URL + "/me/change-password";
 

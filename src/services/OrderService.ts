@@ -2,7 +2,7 @@ import { OrderDTO, Order } from "@/types/OrderTypes";
 import { EntityData } from "@/types/UtilsTypes";
 import { APIUrls, computeFetchURL, computeURLWithId } from "@/utils/APIURLs";
 import { axiosInstance } from "@/utils/Utils";
-import { computeFetchContentURL, computeFetchURLFilteredByStatus, createOrderContentFromResponse, createOrderFromResponse, createOrdersDataFromResponse, createOrdersFromResponse, formatDateAsString } from "@/utils/OrderServiceUtils";
+import { computeFetchContentURL, computeFetchURLFilteredByStatus, createNewOrdersReportFromResponse, createOrderContentFromResponse, createOrderFromResponse, createOrdersCompletedReportFromResponse, createOrdersDataFromResponse, createOrdersFromResponse, createOrdersReportsDTOFromResponse, formatDateAsString } from "@/utils/OrderServiceUtils";
 
 export async function fetchOrders(pageNo?: number, pageSize?: number, sortBy?: string, sortDir?: string, searchText?: string): Promise<EntityData<Order>> {
     const url = computeFetchURL(APIUrls.API_ORDERS_ROOT, pageNo, pageSize, sortBy, sortDir, searchText);
@@ -85,8 +85,6 @@ export async function updateOrder(id: number, orderDTO: OrderDTO) {
     return updatedOrder;
 }
 
-// TODO: implement update order content (client and server)
-
 export async function updateOrderStatus(orderId: number, statusId: number) {
     const url = APIUrls.API_ORDERS_ROOT + "/status/" + orderId + "/" + statusId;
     const response = await axiosInstance({
@@ -137,4 +135,34 @@ export async function computeContentPrice(productId: number, amount: number): Pr
     });
     const price = response.data;
     return price;
+}
+
+export async function getOrdersReports() {
+    const url = APIUrls.API_ORDERS_ROOT + "/reports";
+    const response = await axiosInstance({
+        method: 'get',
+        url: url
+    });
+    const reports = createOrdersReportsDTOFromResponse(response);
+    return reports;
+}
+
+export async function getOrderCompletedReport() {
+    const url = APIUrls.API_ORDERS_REPORTS + "/complete";
+    const response = await axiosInstance({
+        method: 'get',
+        url: url
+    });
+    const report = createOrdersCompletedReportFromResponse(response);
+    return report;
+}
+
+export async function getNewOrdersReport() {
+    const url = APIUrls.API_ORDERS_REPORTS + "/new";
+    const response = await axiosInstance({
+        method: 'get',
+        url: url
+    });
+    const report = createNewOrdersReportFromResponse(response);
+    return report;
 }

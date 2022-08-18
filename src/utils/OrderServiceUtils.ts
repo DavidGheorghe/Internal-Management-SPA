@@ -1,7 +1,7 @@
-import { Order, OrderStatus, RetrievedOrderContentDTO } from "@/types/OrderTypes";
+import { NewOrdersReportDTO, Order, OrdersCompletedReportDTO, ActiveAndDueOrdersReportsDTO, OrderStatus, RetrievedOrderContentDTO } from "@/types/OrderTypes";
 import { EntityData } from "@/types/UtilsTypes";
 import { def } from "@vue/shared";
-import { AxiosResponse } from "axios";
+import { Axios, AxiosResponse } from "axios";
 import { APIUrls, computePaginationPartFromFetchURL } from "./APIURLs";
 
 export function createOrdersDataFromResponse(response: AxiosResponse<any>) {
@@ -114,8 +114,8 @@ export function computeStatusFromString(statusAsStr: string): number | undefined
         case "READY":
             status = OrderStatus.READY;
             break;
-        case "COMPLETED":
-            status = OrderStatus.COMPLETED
+        case "COMPLETE":
+            status = OrderStatus.COMPLETE
             break;
         default:
             status = undefined;
@@ -153,4 +153,40 @@ export function formatDay(dayStr: string) {
         return "0" + dayStr;
     }
     return dayStr;
+}
+
+export function createOrdersReportsDTOFromResponse(response: AxiosResponse<any>) {
+    const reports: ActiveAndDueOrdersReportsDTO = {
+        numberOfDueOrders: response.data.numberOfDueOrders,
+        numberOfActiveOrders: response.data.numberOfActiveOrders
+    };
+    return reports;
+}
+
+export function createOrdersCompletedReportFromResponse(response: AxiosResponse<any>) {
+    const report: OrdersCompletedReportDTO = {
+        numberOfCompletedOrdersEightWeeksAgo: response.data.numberOfOrderCompletedEightWeeksAgo,
+        numberOfCompletedOrdersSevenWeeksAgo: response.data.numberOfOrderCompletedSevenWeeksAgo,
+        numberOfCompletedOrdersSixWeeksAgo: response.data.numberOfOrderCompletedSixWeeksAgo,
+        numberOfCompletedOrdersFiveWeeksAgo: response.data.numberOfOrderCompletedFiveWeeksAgo,
+        numberOfCompletedOrdersFourWeeksAgo: response.data.numberOfOrderCompletedFourWeeksAgo,
+        numberOfCompletedOrdersThreeWeeksAgo: response.data.numberOfOrderCompletedThreeWeeksAgo,
+        numberOfCompletedOrdersTwoWeeksAgo: response.data.numberOfOrderCompletedTwoWeeksAgo,
+        numberOfCompletedOrdersOneWeekAgo: response.data.numberOfOrderCompletedOneWeekAgo,
+    }
+    return report;
+}
+
+export function createNewOrdersReportFromResponse(response: AxiosResponse<any>) {
+    const report: NewOrdersReportDTO = {
+        numberOfNewOrdersEightWeeksAgo: response.data.numberOfNewOrdersEightWeeksAgo,
+        numberOfNewOrdersSevenWeeksAgo: response.data.numberOfNewOrdersSevenWeeksAgo,
+        numberOfNewOrdersSixWeeksAgo: response.data.numberOfNewOrdersSixWeeksAgo,
+        numberOfNewOrdersFiveWeeksAgo: response.data.numberOfNewOrdersFiveWeeksAgo,
+        numberOfNewOrdersFourWeeksAgo: response.data.numberOfNewOrdersFourWeeksAgo,
+        numberOfNewOrdersThreeWeeksAgo: response.data.numberOfNewOrdersThreeWeeksAgo,
+        numberOfNewOrdersTwoWeeksAgo: response.data.numberOfNewOrdersTwoWeeksAgo,
+        numberOfNewOrdersOneWeekAgo: response.data.numberOfNewOrdersOneWeekAgo
+    }
+    return report;
 }

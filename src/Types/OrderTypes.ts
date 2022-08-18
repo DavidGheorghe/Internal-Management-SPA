@@ -31,7 +31,7 @@ export enum OrderStatus {
 	SEALING = 5,
 	PACKING = 6,
 	READY = 7,
-    COMPLETED = 8
+    COMPLETE = 8
 }
 
 export type RetrievedOrderContentDTO = {
@@ -44,7 +44,7 @@ export type RetrievedOrderContentDTO = {
 
 export type OrderDTO = {
     statusId: number,
-    dueDate: string, // not sure yet, maybe Date
+    dueDate: string,
     details: string,
     customerId: number,
     content: AddOrderContentDTO[]
@@ -60,4 +60,31 @@ export type OrderContentSearchSelectType = {
     product: SearchSelectOption,
     color: SearchSelectOption,
     quantity: number
+}
+
+export type ActiveAndDueOrdersReportsDTO = {
+    numberOfDueOrders: number,
+    numberOfActiveOrders: number,
+}
+
+export type OrdersCompletedReportDTO = {
+    numberOfCompletedOrdersEightWeeksAgo: number,
+    numberOfCompletedOrdersSevenWeeksAgo: number,
+    numberOfCompletedOrdersSixWeeksAgo: number,
+    numberOfCompletedOrdersFiveWeeksAgo: number,
+    numberOfCompletedOrdersFourWeeksAgo: number,
+    numberOfCompletedOrdersThreeWeeksAgo: number,
+    numberOfCompletedOrdersTwoWeeksAgo: number,
+    numberOfCompletedOrdersOneWeekAgo: number,
+}
+
+export type NewOrdersReportDTO = {
+    numberOfNewOrdersEightWeeksAgo: number
+    numberOfNewOrdersSevenWeeksAgo: number
+    numberOfNewOrdersSixWeeksAgo: number
+    numberOfNewOrdersFiveWeeksAgo: number
+    numberOfNewOrdersFourWeeksAgo: number
+    numberOfNewOrdersThreeWeeksAgo: number
+    numberOfNewOrdersTwoWeeksAgo: number
+    numberOfNewOrdersOneWeekAgo: number
 }

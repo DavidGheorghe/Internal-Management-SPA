@@ -21,7 +21,7 @@ const isSandingCurrentStatus = computed(() => currentStatus.value === OrderStatu
 const isSealingCurrentStatus = computed(() => currentStatus.value === OrderStatus.SEALING);
 const isPackingCurrentStatus = computed(() => currentStatus.value === OrderStatus.PACKING);
 const isReadyCurrentStatus = computed(() => currentStatus.value === OrderStatus.READY);
-const isCompletedCurrentStatus = computed(() => currentStatus.value === OrderStatus.COMPLETED);
+const isCompletedCurrentStatus = computed(() => currentStatus.value === OrderStatus.COMPLETE);
 
 const isNewDone = computed(() => isStatusBefore(currentStatus.value, OrderStatus.NEW));
 const isPouringDone = computed(() => isStatusBefore(currentStatus.value, OrderStatus.POURING));
@@ -30,7 +30,7 @@ const isSandingDone = computed(() => isStatusBefore(currentStatus.value, OrderSt
 const isSealingDone = computed(() => isStatusBefore(currentStatus.value, OrderStatus.SEALING));
 const isPackingDone = computed(() => isStatusBefore(currentStatus.value, OrderStatus.PACKING));
 const isReadyDone = computed(() => isStatusBefore(currentStatus.value, OrderStatus.READY));
-const isCompletedDone = computed(() => isStatusBefore(currentStatus.value, OrderStatus.COMPLETED));
+const isCompletedDone = computed(() => isStatusBefore(currentStatus.value, OrderStatus.COMPLETE));
 
 function formatDate(dateStr: string) {
     if(dateStr.length > 10) {

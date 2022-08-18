@@ -81,8 +81,10 @@ defineExpose({
     width: 50%;
     align-self: center;
     justify-self: end;
+    border: none;
     &:hover {
         border: none;
+        box-shadow: none;
         color: #b91c1c;
     }
 }

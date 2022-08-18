@@ -9,15 +9,20 @@ const styles = {
 </script>
 
 <template>
-	<header>
-		<TopNavBar v-show="$route.path !== '/login'"/>
-	</header>
+    <header>
+      <TopNavBar v-show="$route.path !== '/login'"/>
+    </header>
+      <!-- <KeepAlive> -->
 	<Suspense> 
-		<router-view :style="styles"></router-view>
-		<template #fallback>
-        <LoadingView />
-		</template>
+    <!-- <div class="page"> -->
+      <router-view :style="styles"></router-view>
+    <!-- </div> -->
+		<!-- <template #fallback> -->
+        <!-- <h1>ASDDDDDDDDDDDDD</h1> -->
+        <!-- <LoadingView /> -->
+		<!-- </template> -->
 	</Suspense>
+  <!-- </KeepAlive> -->
 </template>
 
 <style>

@@ -8,6 +8,8 @@ import { Order, DashboardOrder, OrderStatus } from '@/types/OrderTypes';
 import { reactive, ref } from 'vue';
 import OrderProgress from '@/components/visual/order/OrderProgress.vue';
 import { useExpandedOrderStore } from '@/stores/ExpandedOrderStore';
+import LoadingView from '@/views/LoadingView.vue';
+import { de } from 'element-plus/es/locale';
 
 const todosSidebarStore = useTodosSidebarStore();
 const expandedOrderStore = useExpandedOrderStore();
@@ -76,56 +78,74 @@ function displaySidebar() {
     }, 500);
 }
 </script>
+<script lang="ts">
+    export default {
+        inheritAttrs: false
+    }
+</script>
 
 <template>
-    <div class="dashboard-view">
-        <main class="main">
-            <section class="pinned-orders-container">
-                <div class="pinned-orders-wrapper">
-                    <span 
-                        v-if="!todosSidebarStore.isDisplayed"
-                        class="material-symbols-outlined show-todos"
-                        @click="displaySidebar"
-                    >
-                        keyboard_double_arrow_left
-                    </span>
-                    <el-scrollbar always >
-                        <div class="pinned-orders">
-                            <DashboardOrderCard 
-                                v-for="(order, index) in pinnedOrders"
-                                :key="order.id"
-                                :id="'order-' + order.id"
-                                :order="order"
-                                @click="displayProgress(order)"
-                                @unpin-order="unpinOrder(index)"
-                            />
-                            <!-- @update-status="updateOrderStatus(newStatus, order)" -->
-                        </div>
-                    </el-scrollbar>
-                </div>
-            </section>
-            <section
-                v-if="expandedOrderStore.isDisplayed"
-                class="order-details"
+    <!-- <KeepAlive> -->
+        <!-- <Suspense> -->
+            <div 
+                class="dashboard-view"
+                v-bind="$attrs"
             >
-                <DashboardOrderExpanded 
-                    class="progress"
-                    :order="expandedOrderStore.getDisplayedOrder!"
-                    @hide-order="hideProgress"
-                />        
-            </section>
-        </main>
-        <aside class="todos">
-            <Transition>
-                <TodosSideBar 
-                    v-show="todosSidebarStore.isDisplayed"
-                     
-                    ref="sidebarRef"
-                    @hide-sidebar="hideSidebar"
-                />
-            </Transition>
-        </aside>
-    </div>
+                <main class="main">
+                    <section class="pinned-orders-container">
+                        <div class="pinned-orders-wrapper">
+                            <span 
+                                v-if="!todosSidebarStore.isDisplayed"
+                                class="material-symbols-outlined show-todos"
+                                @click="displaySidebar"
+                            >
+                                keyboard_double_arrow_left
+                            </span>
+                            <el-scrollbar always >
+                                <div class="pinned-orders">
+                                    <!-- <KeepAlive> -->
+                                    <DashboardOrderCard 
+                                        v-for="(order, index) in pinnedOrders"
+                                        :key="order.id"
+                                        :id="'order-' + order.id"
+                                        :order="order"
+                                        @click="displayProgress(order)"
+                                        @unpin-order="unpinOrder(index)"
+                                    />
+                                    <!-- </KeepAlive> -->
+                                    <!-- @update-status="updateOrderStatus(newStatus, order)" -->
+                                </div>
+                            </el-scrollbar>
+                        </div>
+                    </section>
+                    <section
+                        v-if="expandedOrderStore.isDisplayed"
+                        class="order-details"
+                    >
+                        <DashboardOrderExpanded 
+                            class="progress"
+                            :order="expandedOrderStore.getDisplayedOrder!"
+                            @hide-order="hideProgress"
+                        />        
+                    </section>
+                </main>
+                <aside class="todos">
+                    <Transition>
+                        <TodosSideBar 
+                            v-show="todosSidebarStore.isDisplayed"
+                            
+                            ref="sidebarRef"
+                            @hide-sidebar="hideSidebar"
+                        />
+                    </Transition>
+                </aside>
+            </div>
+            <!-- <template #fallback> -->
+                <!-- <LoadingView /> -->
+                <!-- <h1>ASDDDDDDDDDDDDDDD</h1> -->
+            <!-- </template> -->
+        <!-- </Suspense> -->
+    <!-- </KeepAlive> -->
 </template>
 
 <style scoped lang="less">
