@@ -118,7 +118,7 @@ form {
     }
     .login-button {
         grid-row: 5 / 6;
-        width: 5rem;
+        width: 6rem;
         height: 1.5rem;
         font-size: 1rem;
         font-weight: 500;

@@ -1,9 +1,17 @@
+import { Role } from "./Role"
+
 export type ChangePasswordDTO = {
     oldPassword: string,
     newPassword: string
 }
 
-export type UserDTO = {
+export type User = {
     id: number,
-    // user
+    username: string,
+    roles: Role[]
+}
+
+export type CreateUserDTO = {
+    username: string,
+    rolesIds: number[]
 }

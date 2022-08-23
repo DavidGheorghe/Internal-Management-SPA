@@ -17,44 +17,46 @@ function hideModal() {
 </script>
 
 <template>
-<div class="add-customer">
-    <h3 class="title">Add new customer</h3>
-    <CustomerForm 
-        class="customer-form"
-        @form-submitted="displayModal"
-    />
-    <Teleport to="#modals">
-        <CustomModal 
-                :display="isModalDisplayed"
-                @x-button-click="router.back"
-                @hidden-modal="router.back"
-            >
-            <template v-slot:title>
-                <h2>Customer added successfully!</h2>
-            </template>
-            <template v-slot:text>
-                <h4>Would you like to add another customer?</h4>
-            </template>
-            <template v-slot:cancel-button>
-                <SimpleButton 
-                    class="no-button"
-                    label="No"
-                    @click="router.back"
-                />
-            </template>
-            <template v-slot:ok-button>
-                <SimpleButton 
-                    class="yes-button"
-                    label="Yes"
-                    @click="hideModal"
-                />
-            </template>
-        </CustomModal>
-    </Teleport>
-</div>
+    <div class="add-customer">
+        <h3 class="title">Add new customer</h3>
+        <CustomerForm 
+            class="customer-form"
+            @form-submitted="displayModal"
+        />
+        <Teleport to="#modals">
+            <CustomModal 
+                    :display="isModalDisplayed"
+                    @x-button-click="router.back"
+                    @hidden-modal="router.back"
+                >
+                <template v-slot:title>
+                    <h2>Customer added successfully!</h2>
+                </template>
+                <template v-slot:text>
+                    <h4>Would you like to add another customer?</h4>
+                </template>
+                <template v-slot:cancel-button>
+                    <SimpleButton 
+                        class="no-button"
+                        label="No"
+                        @click="router.back"
+                    />
+                </template>
+                <template v-slot:ok-button>
+                    <SimpleButton 
+                        class="yes-button"
+                        label="Yes"
+                        @click="hideModal"
+                    />
+                </template>
+            </CustomModal>
+        </Teleport>
+    </div>
 </template>
 
 <style lang="less" scoped>
+@import "@/assets/colors.less";
+
 .title {
     text-align: center;
     font-family: TimesNewRoman, "Times New Roman", Times;
@@ -70,5 +72,20 @@ function hideModal() {
     height: 75%;
     width: 50%;
     left: 25%;
+}
+.yes-button {
+    background-color: @custom-green;
+}
+.no-button {
+    background-color: @custom-blue;
+}
+.no-button, .yes-button {
+    border: 1px solid black;
+    border-radius: 0.3rem;
+    width: 3.7rem;
+    height: 2rem;
+    &:hover {
+        box-shadow: inset .01rem .01rem 0rem .05rem black;
+    }
 }
 </style>

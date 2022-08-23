@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { useIsCurrentUserSupervisor } from '@/composables/rolesComposables';
 import { Customer } from '@/types/CustomerTypes';
-import { computed, Ref, ref } from '@vue/reactivity';
-import ActionButton from '../buttons/ActionButton.vue';
-import SubmitButton from '../buttons/SubmitButton.vue';
-import SimpleButton from '../buttons/SimpleButton.vue';
+import { ref } from '@vue/reactivity';
 import { ElNotification } from 'element-plus';
+import ActionButton from '../buttons/ActionButton.vue';
+import SimpleButton from '../buttons/SimpleButton.vue';
+import SubmitButton from '../buttons/SubmitButton.vue';
 
 const props = defineProps<{
     customer: Customer
@@ -18,6 +19,7 @@ const emits = defineEmits<{
 const fullName = `${props.customer.firstName} ${props.customer.lastName}`;// computed(() => `${props.customer.firstName} ${props.customer.lastName}`);
 const areFieldsEditable = ref(false);
 const customerAux = ref<Customer>(props.customer);
+const isCurrentUserSupervisor = useIsCurrentUserSupervisor();
 
 function setFieldsEditable() {
     areFieldsEditable.value = true;
@@ -110,142 +112,160 @@ const customerEditedSuccessfully = () => {
 </script>
 
 <template>
-<div class="customer-card-container">
-    <div class="details">
-        <div class="company-name-wrapper">
-            <span 
-                :contenteditable="areFieldsEditable"
-                :class="{'editable': areFieldsEditable}"
-                @blur="updateCompanyName"
-                @keydown.enter="updateCompanyName"
-            >
-                <strong>{{customerAux.companyName}}</strong>
-            </span>
-        </div>
-        <div class="full-name-wrapper">
-            <div v-if="areFieldsEditable === false">
-                <span class="label">Representative Name: </span>
+    <div class="customer-card-container">
+        <div class="details">
+            <div class="company-name-wrapper">
+                <span 
+                    :contenteditable="areFieldsEditable"
+                    :class="{'editable': areFieldsEditable}"
+                    @blur="updateCompanyName"
+                    @keydown.enter="updateCompanyName"
+                >
+                    <strong>{{customerAux.companyName}}</strong>
+                </span>
+            </div>
+            <div class="full-name-wrapper">
+                <div v-if="areFieldsEditable === false">
+                    <span class="label">Representative Name: </span>
+                    <span 
+                        class="value"
+                        :class="{'editable': areFieldsEditable}"
+                        :contenteditable="areFieldsEditable"
+                    >
+                        {{fullName}}
+                    </span>
+                </div>
+                <div
+                    v-else
+                    class="names-wrapper"
+                >
+                    <div class="first-name-wrapper">
+                        <span class="label">First Name: </span>
+                        <span 
+                            class="value"
+                            :class="{'editable': true}"
+                            :contenteditable="true"
+                            @blur="updateFirstName"
+                            @keydown.enter="updateFirstName"
+                        >
+                            {{customerAux.firstName}}
+                        </span>
+                    </div>
+                    <div class="last-name-wrapper">
+                        <span class="label">Last Name: </span>
+                        <span 
+                            class="value"
+                            :class="{'editable': true}"
+                            :contenteditable="true"
+                            @blur="updateLastName"
+                            @keydown.enter="updateLastName"
+                        >
+                            {{customerAux.lastName}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="cui-wrapper">
+                <span class="label">T.I.N: </span>
                 <span 
                     class="value"
                     :class="{'editable': areFieldsEditable}"
                     :contenteditable="areFieldsEditable"
-                >{{fullName}}</span>
-            </div>
-            <div
-                v-else
-                class="names-wrapper"
-            >
-                <div class="first-name-wrapper">
-                    <span class="label">First Name: </span>
-                    <span 
-                        class="value"
-                        :class="{'editable': true}"
-                        :contenteditable="true"
-                        @blur="updateFirstName"
-                        @keydown.enter="updateFirstName"
-                    >{{customerAux.firstName}}</span>
-                </div>
-                <div class="last-name-wrapper">
-                    <span class="label">Last Name: </span>
-                    <span 
-                        class="value"
-                        :class="{'editable': true}"
-                        :contenteditable="true"
-                        @blur="updateLastName"
-                        @keydown.enter="updateLastName"
-                    >{{customerAux.lastName}}</span>
-                </div>
+                    @blur="updateCUI"
+                    @keydown.enter="updateCUI"
+                >
+                    {{customerAux.cui}}
+                </span>
             </div>
         </div>
-        <div class="cui-wrapper">
-            <span class="label">T.I.N: </span>
-            <span 
-                class="value"
-                :class="{'editable': areFieldsEditable}"
-                :contenteditable="areFieldsEditable"
-                @blur="updateCUI"
-                @keydown.enter="updateCUI"
-            >{{customerAux.cui}}</span>
+        <div class="contact">
+            <div class="email-wrapper">
+                <span class="label">E-mail: </span>
+                <span 
+                    class="value"
+                    :class="{'editable': areFieldsEditable}"
+                    :contenteditable="areFieldsEditable"
+                    @blur="updateEmail"
+                    @keydown.enter="updateEmail"
+                >
+                    {{customerAux.email}}
+                </span>
+            </div>
+            <div class="phone-number-wrapper">
+                <span class="label">Phone Number: </span>
+                <span 
+                    class="value"
+                    :class="{'editable': areFieldsEditable}"
+                    :contenteditable="areFieldsEditable"
+                    @blur="updatePhoneNumber"
+                    @keydown.enter="updatePhoneNumber"
+                >
+                    {{customerAux.phoneNumber}}
+                </span>
+            </div>
+        </div>
+        <div class="addresses">
+            <div class="billing-address-wrapper">
+                <span class="label">Billing Address: </span>
+                <span 
+                    class="value"
+                    :class="{'editable': areFieldsEditable}"    
+                    :contenteditable="areFieldsEditable"
+                    @blur="updateBillingAddress"
+                    @keydown.enter="updateBillingAddress"
+                >
+                    {{customerAux.billingAddress}}
+                </span>
+            </div>
+            <div class="delivery-address-wrapper">
+                <span class="label">Delivery Address: </span>
+                <span 
+                    class="value"
+                    :class="{'editable': areFieldsEditable}"    
+                    :contenteditable="areFieldsEditable"
+                    @blur="updateDeliveryAddress"
+                    @keydown.enter="updateDeliveryAddress"
+                >
+                    {{customerAux.deliveryAddress}}
+                </span>
+            </div>
+        </div>
+        <div 
+            v-if="areFieldsEditable === false"
+            class="action-buttons-wrapper"
+        >
+            <ActionButton
+                class="edit-button"
+                label="Edit"
+                action-type="edit"
+                :disabled="isCurrentUserSupervisor === false"
+                @click="setFieldsEditable"
+            />
+            <ActionButton
+                class="delete-button"
+                label="Delete"
+                action-type="delete"
+                :disabled="isCurrentUserSupervisor === false"
+                @click="deleteCustomer"
+            />
+        </div>
+        <div
+            v-else
+            class="editable-action-buttons"
+        >
+            <SimpleButton 
+                class="cancel-button"
+                label="Cancel"
+                @click="cancelEdit"
+            />
+            <SubmitButton 
+                class="save-button"
+                :is-disabled="false"
+                label="Save"
+                @submit="saveChanges"
+            />
         </div>
     </div>
-    <div class="contact">
-        <div class="email-wrapper">
-            <span class="label">E-mail: </span>
-            <span 
-                class="value"
-                :class="{'editable': areFieldsEditable}"
-                :contenteditable="areFieldsEditable"
-                @blur="updateEmail"
-                @keydown.enter="updateEmail"
-            >{{customerAux.email}}</span>
-        </div>
-        <div class="phone-number-wrapper">
-            <span class="label">Phone Number: </span>
-            <span 
-                class="value"
-                :class="{'editable': areFieldsEditable}"
-                :contenteditable="areFieldsEditable"
-                @blur="updatePhoneNumber"
-                @keydown.enter="updatePhoneNumber"
-            >{{customerAux.phoneNumber}}</span>
-        </div>
-    </div>
-    <div class="addresses">
-        <div class="billing-address-wrapper">
-            <span class="label">Billing Address: </span>
-            <span 
-                class="value"
-                :class="{'editable': areFieldsEditable}"    
-                :contenteditable="areFieldsEditable"
-                @blur="updateBillingAddress"
-                @keydown.enter="updateBillingAddress"
-            >{{customerAux.billingAddress}}</span>
-        </div>
-        <div class="delivery-address-wrapper">
-            <span class="label">Delivery Address: </span>
-            <span 
-                class="value"
-                :class="{'editable': areFieldsEditable}"    
-                :contenteditable="areFieldsEditable"
-                @blur="updateDeliveryAddress"
-                @keydown.enter="updateDeliveryAddress"
-            >{{customerAux.deliveryAddress}}</span>
-        </div>
-    </div>
-    <div 
-        v-if="areFieldsEditable === false"
-        class="action-buttons-wrapper"
-    >
-        <ActionButton
-            class="edit-button"
-            label="Edit"
-            action-type="edit"
-            @click="setFieldsEditable"
-        />
-        <ActionButton
-            class="delete-button"
-            label="Delete"
-            action-type="delete"
-            @click="deleteCustomer"
-        />
-    </div>
-    <div
-        v-else
-        class="editable-action-buttons"
-    >
-        <SimpleButton 
-            class="cancel-button"
-            label="Cancel"
-            @click="cancelEdit"
-        />
-        <SubmitButton 
-            class="save-button"
-            :is-disabled="false"
-            label="Save"
-            @submit="saveChanges"
-        />
-    </div>
-</div>
 </template>
 
 <style lang="less" scoped>
@@ -257,6 +277,7 @@ const customerEditedSuccessfully = () => {
     border: 1px solid black;
     border-radius: 0.2rem;
     padding: 0.4rem;
+    box-shadow: 0.05rem 0.05rem 0.1rem 0.01rem black, -0.05rem -0.05rem 0.1rem 0.01rem rgba(0, 0, 0, 0.103);
     box-sizing: border-box;
     position: relative;
     display: grid;

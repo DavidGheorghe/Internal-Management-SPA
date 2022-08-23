@@ -31,6 +31,7 @@ export function createOrdersFromResponseData(response: AxiosResponse<any>): Orde
         const entryDateInMills = Date.parse(currentOrder.entryDate);
         order.entryDate = new Date(entryDateInMills);
         order.isPinned = currentOrder.pinned;
+        order.assignee = currentOrder.assignee;
 
         orders.push(order);
     }
@@ -47,6 +48,7 @@ export function createOrderFromResponse(response: AxiosResponse<any>): Order {
     order.entryDate = response.data.entryDate;
     order.status = response.data.status;
     order.isPinned = response.data.pinned;
+    order.assignee = response.data.assignee;
 
     return order;
 }
@@ -64,6 +66,7 @@ export function createOrdersFromResponse(response: AxiosResponse<any>): Order[] 
         order.isPinned = responseOrder.pinned;
         order.status = responseOrder.status;
         order.entryDate = responseOrder.entryDate;
+        order.assignee = responseOrder.assignee;
 
         orders.push(order);
     }

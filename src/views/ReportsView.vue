@@ -7,17 +7,6 @@ import CompletedAndNewOrdersReport from '@/components/visual/reports/CompletedAn
 
 <template>
     <main class="reports-view">
-        <!-- <el-tabs type="border-card">
-            <el-tab-pane label="Orders">
-                <OrderReport />
-            </el-tab-pane>
-            <el-tab-pane label="Products">
-
-            </el-tab-pane>
-            <el-tab-pane label="Customers">
-
-            </el-tab-pane>
-        </el-tabs> -->
         <section class="orders-reports-section">
             <div class="completed-and-new-orders-report-wrapper">
                 <CompletedAndNewOrdersReport />
@@ -25,9 +14,7 @@ import CompletedAndNewOrdersReport from '@/components/visual/reports/CompletedAn
             <div class="active-and-due-report-wrapper">
                 <OrdersReport />
             </div>
-            <!-- <ProductReport /> -->
         </section>
-
     </main>
 </template>
 

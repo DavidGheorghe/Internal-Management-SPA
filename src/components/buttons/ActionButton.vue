@@ -44,8 +44,9 @@ defineEmits<{
     }
     &:disabled {
         border: inherit;
+        box-shadow: none;
         color: inherit;
-        cursor: default !important;
+        cursor: not-allowed !important;
         opacity: 0.6;
     }
 }

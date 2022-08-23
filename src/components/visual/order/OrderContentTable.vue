@@ -26,7 +26,7 @@ watch(currentOrderId, async () => {
         </thead>
         <tbody>
             <tr v-for="(item, index) in content" :key="item.id">
-                <td class="index-column">{{index}}</td>
+                <td class="index-column">{{index + 1}}</td>
                 <td class="product-name-column">{{ item.product.name }}</td>
                 <td>{{ item.color.name }}</td>
                 <td class="numerical-cell">{{ item.quantity }}</td>

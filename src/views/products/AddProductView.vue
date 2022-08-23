@@ -60,7 +60,9 @@ function hideModal() {
 </div>
 </template>
 
-<style scoped>
+<style scoped lang="less">
+@import "@/assets/colors.less";
+
 .add-product-view {
     height: calc(100% - 7vh);
     margin-top: 7vh;
@@ -81,10 +83,18 @@ function hideModal() {
 }
 
 .yes-button {
-    background-color: green;
+    background-color: @custom-green;
 }
-
 .no-button {
-    background-color: grey;
+    background-color: @custom-blue;
+}
+.no-button, .yes-button {
+    border: 1px solid black;
+    border-radius: 0.3rem;
+    width: 3.7rem;
+    height: 2rem;
+    &:hover {
+        box-shadow: inset .01rem .01rem 0rem .05rem black;
+    }
 }
 </style>

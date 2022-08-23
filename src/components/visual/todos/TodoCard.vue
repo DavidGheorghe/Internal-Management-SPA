@@ -2,7 +2,7 @@
 import { Todo } from '@/types/TodoTypes';
 import InputTextarea from '@/components/controls/InputTextarea.vue';
 import { ref } from 'vue';
-import ActionButton from '../buttons/ActionButton.vue';
+import ActionButton from '@/components/buttons/ActionButton.vue';
 import { deleteById, updateTodo } from '@/services/TodoService';
 
 const props = defineProps<{
@@ -12,11 +12,15 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: 'delete-todo'): void
 }>();
+
+const textareaRef = ref<HTMLTextAreaElement>();
+
 const currentText = ref(props.todo.text);
 const isTodoReadonly = ref(true);
 
 function setTodoAsEditable() {
     isTodoReadonly.value = false;
+    textareaRef.value?.focus();
 }
 
 function setTodoAsReadonly() {
@@ -51,7 +55,8 @@ function deleteTodo() {
     <el-card class="todo-card-container">
         <div class="todo-card-body">
             <!-- <el-scrollbar always> -->
-                <textarea 
+                <textarea
+                    ref="textareaRef" 
                     class="todo-content"
                     v-model="currentText"
                     :readonly="isTodoReadonly"

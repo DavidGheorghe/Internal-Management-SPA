@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/UserStore';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import ChangePasswordModal from '../visual/ChangePasswordModal.vue';
 
 const props = defineProps<{
@@ -8,12 +8,9 @@ const props = defineProps<{
 }>();
 
 const user = useUserStore();
-const isMouseOnContainer = ref(false);
 
-const rolesStr = user.currentUserRoles.join(', ');
-
+const rolesStr = computed(() => user.getCurrentUserRoles.join(', '));
 const isChangePasswordModalDisplayed = ref(false);
-
 
 const emits = defineEmits<{
     (e: 'mouseHovered', value: boolean): void,
@@ -47,7 +44,7 @@ function hideChangePasswordModal() {
             <button 
                 type="button" 
                 class="action change-password"
-                @click="displayChangePasswordModal"
+                @mousedown="displayChangePasswordModal"
             >
                 <span class="material-symbols-outlined">key</span>
                 Change Password
@@ -55,19 +52,19 @@ function hideChangePasswordModal() {
             <button 
                 type="button" 
                 class="action logout"
-                @click="logOut"
+                @mousedown="logOut"
             >
                 <span class="material-symbols-outlined">logout</span>
                 Log Out
             </button>
         </div>
-    </div>
     <Teleport to="#modals">
         <ChangePasswordModal 
             :display="isChangePasswordModalDisplayed"
             @hidden-modal="hideChangePasswordModal"
         />
     </Teleport>
+    </div>
 </template>
 
 <style lang="less" scoped>

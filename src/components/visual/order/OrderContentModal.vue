@@ -15,13 +15,6 @@ defineEmits<{
     (e: 'hide-modal'): void,
     (e: 'x-button-click'): void
 }>();
-
-// const content = ref<RetrievedOrderContentDTO[]>((await fetchContentByOrderId(props.orderId)));
-// fetchOrderContent();
-// content.value = (await fetchContentByOrderId(props.orderId));
-// async function fetchOrderContent() {
-//     content.value = (await fetchContentByOrderId(props.orderId));
-// }
 </script>
 
 <template>
@@ -69,6 +62,7 @@ defineEmits<{
     height: 45%;
     width: 40%;
     background-color: #efefef;
+    border-radius: 0.2rem;
     position: relative;
     display: flex;
     align-items: center;

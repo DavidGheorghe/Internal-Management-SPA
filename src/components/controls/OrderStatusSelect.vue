@@ -5,6 +5,7 @@ import { statusesAsStrings } from '@/utils/Utils';
 
 const props = defineProps<{
     status: OrderStatus,
+    disabled: boolean
 }>();
 
 const emit = defineEmits<{
@@ -13,7 +14,7 @@ const emit = defineEmits<{
 
 const isDisabled = ref(true);
 
-const statuses = [...statusesAsStrings];
+const statuses = computed(() => [...statusesAsStrings]);
 
 const currentStatus = computed({
     get() {
@@ -30,6 +31,7 @@ const currentStatus = computed({
 <template>
     <el-select 
         v-model="currentStatus"
+        :disabled="disabled"
     >
         <el-option 
             v-for="status of statuses"

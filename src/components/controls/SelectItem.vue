@@ -12,9 +12,6 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void
 }>();
 
-// function sendNewValue(newValue: string) {
-//     emits('updateValue', newValue);
-// }
 const currentOption = computed({
     get() {
         return props.modelValue;
@@ -47,9 +44,7 @@ const currentOption = computed({
         </select>
         <span class="material-symbols-outlined expand-arrow">expand_more</span>
     </div> -->
-    <el-select 
-        v-model="currentOption"
-    >
+    <el-select v-model="currentOption">
         <el-option 
             v-for="option of options"
             :key="option"

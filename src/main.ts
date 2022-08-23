@@ -9,6 +9,7 @@ import "@/assets/colors.less";
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
+
 createApp(App)
     .use(router)
     .use(pinia)

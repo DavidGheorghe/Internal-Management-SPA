@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import ActionButton from '../buttons/ActionButton.vue';
+import ActionButton from '@/components/buttons/ActionButton.vue';
 
 const currentText = ref("");
 const textarea = ref<HTMLTextAreaElement>();
@@ -9,6 +9,7 @@ const emit = defineEmits<{
     (e: 'add-todo', text: string): void,
     (e: 'discard-todo'): void
 }>();
+
 onMounted(() => {
     textarea.value?.focus();
 });

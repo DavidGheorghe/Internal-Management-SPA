@@ -3,6 +3,7 @@ import { EntityData } from "@/types/UtilsTypes";
 import { APIUrls, computeFetchURL, computeURLWithId } from "@/utils/APIURLs";
 import { axiosInstance } from "@/utils/Utils";
 import { computeFetchContentURL, computeFetchURLFilteredByStatus, createNewOrdersReportFromResponse, createOrderContentFromResponse, createOrderFromResponse, createOrdersCompletedReportFromResponse, createOrdersDataFromResponse, createOrdersFromResponse, createOrdersReportsDTOFromResponse, formatDateAsString } from "@/utils/OrderServiceUtils";
+import { useUserStore } from "@/stores/UserStore";
 
 export async function fetchOrders(pageNo?: number, pageSize?: number, sortBy?: string, sortDir?: string, searchText?: string): Promise<EntityData<Order>> {
     const url = computeFetchURL(APIUrls.API_ORDERS_ROOT, pageNo, pageSize, sortBy, sortDir, searchText);
@@ -34,7 +35,8 @@ export async function fetchOrderById(id: number): Promise<Order> {
 }
 
 export async function fetchPinnedOrders() {
-    const url = APIUrls.API_ORDERS_ROOT + "/pinned";
+    const userStore = useUserStore();
+    const url = APIUrls.API_ORDERS_ROOT + "/dashboard/" + userStore.getCurrentUserId;
     const response = await axiosInstance({
         method: 'get',
         url: url
@@ -96,7 +98,8 @@ export async function updateOrderStatus(orderId: number, statusId: number) {
 }
 
 export async function pinOrder(id: number) {
-    const url = APIUrls.API_ORDERS_ROOT + "/pin/" + id;
+    const userStore = useUserStore();
+    const url = APIUrls.API_ORDERS_ROOT + "/pin/" + id + "/" + userStore.getCurrentUserId;
     const response = await axiosInstance({
         method: 'put',
         url: url
@@ -106,13 +109,30 @@ export async function pinOrder(id: number) {
 }
 
 export async function unpinOrder(id: number) {
-    const url = APIUrls.API_ORDERS_ROOT + "/unpin/" + id;
+    const userStore = useUserStore();
+    const url = APIUrls.API_ORDERS_ROOT + "/unpin/" + id + "/" + userStore.getCurrentUserId;
     const response = await axiosInstance({
         method: 'put',
         url: url
     });
     const order = createOrderFromResponse(response);
     return order;
+}
+
+export async function assignOrder(orderId: number, userId: number) {
+    const url = APIUrls.API_ORDERS_ROOT + "/assign/" + orderId + "/" + userId;
+    await axiosInstance({
+        method: 'put',
+        url: url
+    });
+}
+
+export async function removeAssignedOrder(orderId: number, userId: number) {
+    const url = APIUrls.API_ORDERS_ROOT + "/remove-assigned/" + orderId + "/" + userId;
+    await axiosInstance({
+        method: 'put',
+        url: url
+    });
 }
 
 export async function updateDueDate(orderId: number, newDueDate: Date) {

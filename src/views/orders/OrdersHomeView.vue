@@ -14,6 +14,8 @@ import SimpleButton from '@/components/buttons/SimpleButton.vue';
 import SelectItem from '@/components/controls/SelectItem.vue';
 import { statusesAsStrings } from '@/utils/Utils';
 import { computeStatusFromString, getIdFromStatus } from '@/utils/OrderServiceUtils';
+import { useRemoveElement } from '@/composables/useRemoveElement';
+import { useIsCurrentUserSupervisor } from '@/composables/rolesComposables';
 
 const router = useRouter();
 
@@ -30,6 +32,8 @@ const orderToBeDeleted = ref<Order>();
 
 const statusFilterOptions = ["ALL", ...statusesAsStrings];
 const currentStatusFilter = ref("ALL");
+
+const isCurrentUserSupervisor = useIsCurrentUserSupervisor();
 
 (await initOrdersData());
 
@@ -51,10 +55,6 @@ async function updateStatusFilter(newFilter: string) {
     }
 }
 
-function updateSortDir() {
-
-}
-
 function goToAddPage() {
     const url = "orders/add-order";
     router.push(url);
@@ -62,10 +62,24 @@ function goToAddPage() {
 
 async function deleteOrder() {
     if (orderToBeDeleted.value) {
-        deleteOrderById(orderToBeDeleted.value.id);
+        await deleteOrderById(orderToBeDeleted.value.id);
         hideDeleteModal();
+        if (ordersData.value?.content) {
+            const index = getIndexById(orderToBeDeleted.value.id);
+            ordersData.value.content = useRemoveElement(index, ordersData.value.content);
+        }
     }
     (await initOrdersData());
+}
+
+function getIndexById(id: number) {
+    let finalIndex: number = -1;
+    ordersData.value?.content.forEach((element, index) => {
+        if (element.id === id) {
+            finalIndex = index;
+        }
+    })
+    return finalIndex;
 }
 
 function showDeleteModal(order: Order) {
@@ -109,6 +123,7 @@ watchEffect(() => {
             <ActionButton
                 class="add-button"
                 action-type="add"
+                :disabled="isCurrentUserSupervisor === false"
                 label="Add Order"
                 @click="goToAddPage"
             />
@@ -164,7 +179,7 @@ watchEffect(() => {
                     />
                 </template>
             </CustomModal>
-    </Teleport>
+        </Teleport>
     </div>
 </template>
 

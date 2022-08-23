@@ -1,16 +1,18 @@
 <script setup lang="ts">
+import ActionButton from '@/components/buttons/ActionButton.vue';
+import SimpleButton from '@/components/buttons/SimpleButton.vue';
+import Pagination from '@/components/controls/Pagination.vue';
+import SearchBar from '@/components/controls/SearchBar.vue';
+import CustomerCard from '@/components/visual/CustomerCard.vue';
+import CustomModal from '@/components/visual/CustomModal.vue';
+import { useIsCurrentUserSupervisor } from '@/composables/rolesComposables';
+import { useRemoveElement } from '@/composables/useRemoveElement';
 import { deleteCustomerById, fetchCustomers, updateCustomer } from '@/services/CustomerSerivce';
 import { Customer } from '@/types/CustomerTypes';
 import { EntityData, PaginationParams } from '@/types/UtilsTypes';
-import { reactive, ref, watchEffect } from 'vue';
-import CustomerCard from '@/components/visual/CustomerCard.vue';
-import SearchBar from '@/components/controls/SearchBar.vue';
-import Pagination from '@/components/controls/Pagination.vue';
-import CustomModal from '@/components/visual/CustomModal.vue';
-import SimpleButton from '@/components/buttons/SimpleButton.vue';
-import ActionButton from '@/components/buttons/ActionButton.vue';
-import { useRouter } from 'vue-router';
 import paginationParamsDefaults from '@/utils/PaginationParamsDefaults';
+import { reactive, ref, watchEffect } from 'vue';
+import { useRouter } from 'vue-router';
 
 const customersData = ref<EntityData<Customer>>();
 const router = useRouter();
@@ -21,6 +23,8 @@ const searchText = ref("");
 
 const isDeleteModalDisplayed = ref(false);
 const customerToBeDeleted = ref<Customer>();
+
+const isCurrentUserSupervisor = useIsCurrentUserSupervisor();
 
 (await initCustomersData());
 
@@ -38,8 +42,12 @@ async function saveCustomer(customer: Customer) {
 }
 
 async function deleteCustomer(id: number) {
-    deleteCustomerById(id);
+    await deleteCustomerById(id);
     hideDeleteModal();
+    if (customersData.value?.content) {
+        const index = getIndexById(id);
+        customersData.value.content = useRemoveElement(index, customersData.value.content);
+    }
 }
 
 function showDeleteModal(customer: Customer) {
@@ -55,6 +63,17 @@ function goToAddPage() {
     const url = "/customers/add-customer";
     router.push(url);
 }
+
+function getIndexById(id: number) {
+    let finalIndex: number = -1;
+    customersData.value?.content.forEach((element, index) => {
+        if (element.id === id) {
+            finalIndex = index;
+        }
+    })
+    return finalIndex;
+}
+
 
 watchEffect(async () => {
     initCustomersData();
@@ -74,24 +93,19 @@ watchEffect(async () => {
                     class="add-button"
                     action-type="add"
                     label="New Customer"
+                    :disabled="isCurrentUserSupervisor === false"
                     @click="goToAddPage"
                 />
             </div>
             <div class="cards-container">
-                <!-- <div 
-                    class="customers-card-container" 
+                <CustomerCard 
                     v-for="customer in customersData?.content"
                     :key="customer.id"
-                > -->
-                    <CustomerCard 
-                        v-for="customer in customersData?.content"
-                        :key="customer.id"
-                        class="customer-card"
-                        :customer="customer"
-                        @customer-edited="saveCustomer"
-                        @customer-deleted="showDeleteModal"
-                    />
-                <!-- </div> -->
+                    class="customer-card"
+                    :customer="customer"
+                    @customer-edited="saveCustomer"
+                    @customer-deleted="showDeleteModal"
+                />
             </div>
             <Pagination
                 class="pagination"

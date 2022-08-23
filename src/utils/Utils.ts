@@ -1,4 +1,5 @@
 import { OrderStatus } from '@/types/OrderTypes';
+import { Role } from '@/types/Role';
 import { EntityData } from '@/types/UtilsTypes';
 import axios, { AxiosResponse } from 'axios';
 import { APIUrls } from './APIURLs';
@@ -111,4 +112,24 @@ function computeDateStringForWeeksAgo(week1: number, week2: number) {
 
 function substractDays(numberOfDays: number) {
     return new Date(new Date().setDate(new Date().getDate() - numberOfDays));
+}
+
+export const rolesAsStr: string[] = [
+    Role[Role.EMPLOYEE],
+    Role[Role.SUPERVISOR],
+    Role[Role.ADMIN]
+]
+
+export const roles: Role[] = [
+    Role.EMPLOYEE,
+    Role.SUPERVISOR,
+    Role.ADMIN
+]
+
+export function getIdsFromRoles(roles: Role[]) {
+    const ids: number[] = [];
+    for (let i = 0; i < roles.length; i++) {
+        ids.push(Number.parseInt(Role[roles[i]]));
+    }
+    return ids;
 }

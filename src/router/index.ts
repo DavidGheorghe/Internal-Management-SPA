@@ -21,6 +21,7 @@ import UpdateProductView from '@/views/products/UpdateProductView.vue'
 import PageNotFoundView from '@/views/PageNotFoundView.vue'
 import { useUserStore } from '@/stores/UserStore'
 import { Role } from '@/types/Role';
+import { useIsCurrentUserAdmin, useIsCurrentUserSupervisor } from '@/composables/rolesComposables'
 
 const goToLoginIfNotAuthenticated = (to: RouteLocationNormalized, from: RouteLocationNormalized) => {
 	const userStore = useUserStore();
@@ -46,14 +47,14 @@ const routes: Array<RouteRecordRaw> = [
 		path: '/',
 		name: 'Dashboard',
 		component: DashboardView,
-		meta: {requiresAuthentication: true, isInNavbar: true},
+		meta: {requiresAuthentication: true, isInNavbar: true, requiredRoles: [Role[Role.ADMIN], Role[Role.EMPLOYEE], Role[Role.SUPERVISOR]]},
 		beforeEnter: [goToLoginIfNotAuthenticated]
 	},
 	{
 		path: '/orders',
 		name: 'Orders',
 		component: OrdersView,
-		meta: {requiresAuthentication: true, isInNavbar: true},
+		meta: {requiresAuthentication: true, isInNavbar: true, requiredRoles: [Role[Role.ADMIN], Role[Role.EMPLOYEE], Role[Role.SUPERVISOR]]},
 		children: [
 			{
 				path: '',
@@ -75,13 +76,13 @@ const routes: Array<RouteRecordRaw> = [
 				component: UpdateOrderView
 			}
 		],
-		beforeEnter: [goToLoginIfNotAuthenticated, goToHomeIfNotAdmin]
+		beforeEnter: [goToLoginIfNotAuthenticated]
 	},
 	{
 		path: '/products',
 		name: 'Products',
 		component: ProductsView,
-		meta: {requiresAuthentication: true, isInNavbar: true},
+		meta: {requiresAuthentication: true, isInNavbar: true, requiredRoles: [Role[Role.ADMIN], Role[Role.EMPLOYEE], Role[Role.SUPERVISOR]]},
 		children: [
 			{
 				path: '',
@@ -107,7 +108,7 @@ const routes: Array<RouteRecordRaw> = [
 	{
 		path: '/colors',
 		name: 'Colors',
-		meta: {requiresAuthentication: true, isInNavbar: true},
+		meta: {requiresAuthentication: true, isInNavbar: true, requiredRoles: [Role[Role.ADMIN], Role[Role.EMPLOYEE], Role[Role.SUPERVISOR]]},
 		component: ColorsView,
 		children: [
 			{
@@ -129,7 +130,8 @@ const routes: Array<RouteRecordRaw> = [
 				meta: {requiresAuthentication: true},
 				component: UpdateColorView
 			}
-		]
+		],
+		beforeEnter: [goToLoginIfNotAuthenticated]
 	},
 	// {
 	// 	path: '/categories',
@@ -140,7 +142,7 @@ const routes: Array<RouteRecordRaw> = [
 	{
 		path: '/customers',
 		name: 'Customers',
-		meta: {requiresAuthentication: true, isInNavbar: true},
+		meta: {requiresAuthentication: true, isInNavbar: true, requiredRoles: [Role[Role.SUPERVISOR]]},
 		component: CustomersView,
 		children: [
 			{
@@ -155,25 +157,23 @@ const routes: Array<RouteRecordRaw> = [
 				meta: {requiresAuthentication: true},
 				component: AddCustomerView
 			}
-		]
+		],
+		beforeEnter: [goToLoginIfNotAuthenticated]
 	},
 	{
 		path: '/reports',
 		name: 'Reports',
-		meta: {requiresAuthentication: true, isInNavbar: true},
-		component: ReportsView
+		meta: {requiresAuthentication: true, isInNavbar: true, requiredRoles: [Role[Role.ADMIN], Role[Role.EMPLOYEE], Role[Role.SUPERVISOR]]},
+		component: ReportsView,
+		beforeEnter: [goToLoginIfNotAuthenticated]
 	},
 	{
 		path: '/users',
 		name: 'Users',
-		meta: {requiresAuthentication: true, isInNavbar: true},
-		component: UsersView
+		meta: {requiresAuthentication: true, isInNavbar: true, requiredRoles: [Role[Role.ADMIN]]},
+		component: UsersView,
+		beforeEnter: [goToLoginIfNotAuthenticated]
 	},
-	// {
-	// 	path: '/loading',
-	// 	name: 'Loading',
-	// 	component: LoadingView
-	// },
 	{
 		path: '/:pathMatch(.*)*',
 		name: 'PageNotFound',
@@ -198,6 +198,14 @@ router.beforeEach((to, from) => {
 		}
 	}
 });
+
+declare module 'vue-router' {
+	interface RouteMeta {
+		requiresAuthentication: boolean,
+		isInNavbar?: boolean,
+		requiredRoles?: string[]
+	}
+}
 
 export default router
 

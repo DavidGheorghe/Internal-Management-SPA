@@ -2,9 +2,9 @@
 import { getTodosByUserId, addTodo, deleteById } from '@/services/TodoService';
 import { useUserStore } from '@/stores/UserStore';
 import { Todo } from '@/types/TodoTypes';
-import { reactive, ref, watch, watchEffect } from 'vue';
-import TodoCard from './TodoCard.vue';
-import NewTodoCard from './NewTodoCard.vue';
+import { ref, watch, computed } from 'vue';
+import TodoCard from '@/components/visual/todos/TodoCard.vue';
+import NewTodoCard from '@/components/visual/todos/NewTodoCard.vue';
 
 
 defineEmits<{
@@ -13,19 +13,18 @@ defineEmits<{
 
 const userStore = useUserStore();
 const todos = ref<Todo[]>([]);
-// const reverseTodos = todos.value.reverse();
 
 (await initTodos());
-const newTodoText = ref("");
 const isNewTodoAdded = ref(false);
 
+const isSidebarEmpty = computed(() => todos.value.length === 0 && isNewTodoAdded.value === false);
+
 async function initTodos() {
-    todos.value = (await getTodosByUserId(userStore.getCurrentUserId!)).reverse(); // .reverse()
+    todos.value = (await getTodosByUserId(userStore.getCurrentUserId!)).reverse();
 }
 
 function addTodoFront(text: string) {
     const newTodo = {
-        id: todos.value[todos.value.length - 1].id,
         isCompleted: false,
         text: text,
         userId: userStore.getCurrentUserId
@@ -76,7 +75,7 @@ watch(todos, () => {
                 </span>
             </header>
             <main>
-                <el-space direction="vertical">
+                <el-space  direction="vertical">
                     <NewTodoCard
                         v-if="isNewTodoAdded"
                         @add-todo="addTodoFront"
@@ -89,6 +88,12 @@ watch(todos, () => {
                         @delete-todo="deleteTodo(todo.id, index)"
                     />
                 </el-space>
+                <div 
+                    v-if="isSidebarEmpty"
+                    class="empty-todos-placeholder-wrapper"
+                >
+                    <span class="empty-todos-placeholder">Start Adding Todos.</span>
+                </div>
             </main>
         </div>
     </el-scrollbar>
@@ -96,6 +101,7 @@ watch(todos, () => {
 
 <style lang="less" scoped>
 .sidebar-container {
+    width: 22rem;
     position: relative;
     display: grid;
     grid-template-columns: auto;
@@ -115,6 +121,13 @@ watch(todos, () => {
     font-size: 36px;
     justify-self: end;
     margin-right: 0.5rem;
+}
+.empty-todos-placeholder-wrapper {
+    text-align: center;
+}
+.empty-todos-placeholder {
+    font-size: 1.5rem;
+    color: grey;
 }
 .v-enter-active,
 .v-leave-active {

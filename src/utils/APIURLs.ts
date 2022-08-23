@@ -1,5 +1,7 @@
 export class APIUrls {
     static readonly BASE_URL = "http://localhost:8080/api";
+    static readonly ADMIN_BASE_URL = "http://localhost:8080/admin/api";
+    
     static readonly API_LOGIN_URL = APIUrls.BASE_URL + "/auth/login";
     static readonly API_REFRESH_TOKEN = APIUrls.BASE_URL + "/auth/refresh-token";
 
@@ -13,6 +15,7 @@ export class APIUrls {
     static readonly API_TODOS_ROOT = APIUrls.BASE_URL + "/todos";
     static readonly API_CHANGE_PASSWORD = APIUrls.BASE_URL + "/me/change-password";
 
+    static readonly API_USERS_ROOT = APIUrls.ADMIN_BASE_URL + "/users";
 }
 
 export function computePaginationPartFromFetchURL(pageNo?: number, pageSize?: number, sortBy?: string, sortDir?: string, hasQuestionMark?:boolean) {

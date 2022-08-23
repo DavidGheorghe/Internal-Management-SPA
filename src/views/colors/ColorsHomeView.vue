@@ -1,28 +1,26 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch, watchEffect } from 'vue';
-import { EntityData, PaginationParams } from '@/types/UtilsTypes';
-import { SizeType } from '@/utils/Utils';
-import { Color } from "@/types/ColorTypes";
-import { deleteColorById, fetchColors } from '@/services/ColorService';
-import { useRouter } from 'vue-router';
-import paginationParamsDefaults from "@/utils/PaginationParamsDefaults";
+import ActionButton from '@/components/buttons/ActionButton.vue';
+import SimpleButton from '@/components/buttons/SimpleButton.vue';
 import PageSizeIconsOptions from '@/components/controls/PageSizeIconsOptions.vue';
+import Pagination from '@/components/controls/Pagination.vue';
 import RadioGroup from '@/components/controls/RadioGroup.vue';
 import SearchBar from '@/components/controls/SearchBar.vue';
-import ActionButton from '@/components/buttons/ActionButton.vue';
 import CustomModal from '@/components/visual/CustomModal.vue';
-import SimpleButton from '@/components/buttons/SimpleButton.vue';
-import Pagination from '@/components/controls/Pagination.vue';
+import { useIsCurrentUserSupervisor } from '@/composables/rolesComposables';
+import { useRemoveElement } from '@/composables/useRemoveElement';
+import { deleteColorById, fetchColors } from '@/services/ColorService';
+import { Color } from "@/types/ColorTypes";
+import { EntityData, PaginationParams } from '@/types/UtilsTypes';
+import paginationParamsDefaults from "@/utils/PaginationParamsDefaults";
+import { SizeType } from '@/utils/Utils';
+import { computed, reactive, ref, watch, watchEffect } from 'vue';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
 /* Variables declaration. */
 const paginationParams = reactive<PaginationParams>({...paginationParamsDefaults});
 paginationParams.sortBy = "name";
-// const pageNo = ref(0);
-// const pageSize = ref(15);
-// const sortBy = ref("name");
-// const sortDir = ref("asc");
 const searchText = ref("");
 
 const currentPigmentOption = ref("All");
@@ -42,6 +40,8 @@ const currentNumberOfPigments = computed(() => {
 const isDeleteModalDisplayed = ref(false);
 const deletedColorName = ref<string>();
 const deletedColorId = ref<number>()
+
+const isCurrentUserSupervisor = useIsCurrentUserSupervisor();
 
 const colorsData = ref<EntityData<Color>>();
 
@@ -81,10 +81,14 @@ function goToEditPage(id: number) {
     router.push(editColorPageURL);
 }
 
-function deleteProduct(id: number) {
-    deleteColorById(id);
+async function deleteProduct(id: number) {
+    await deleteColorById(id);
     updateColorsData();
     hideDeleteModal();
+    if (colorsData.value?.content) {
+        const index = getIndexById(id);
+        colorsData.value.content = useRemoveElement(index, colorsData.value.content);
+    }
 }
 
 function displayDeleteModal(id: number, name: string) {
@@ -95,6 +99,16 @@ function displayDeleteModal(id: number, name: string) {
 
 function hideDeleteModal() {
     isDeleteModalDisplayed.value = false;
+}
+
+function getIndexById(id: number) {
+    let finalIndex: number = -1;
+    colorsData.value?.content.forEach((element, index) => {
+        if (element.id === id) {
+            finalIndex = index;
+        }
+    })
+    return finalIndex;
 }
 
 watchEffect(async () => {
@@ -138,6 +152,7 @@ watch(currentPigmentOption, async (newOption, oldOption) => {
                 class="add-button"
                 label="New Color"
                 action-type="add"
+                :disabled="isCurrentUserSupervisor === false"
                 @click="goToAddPage"
             />
         </div>
@@ -153,7 +168,7 @@ watch(currentPigmentOption, async (newOption, oldOption) => {
                         <th class="numerical-cell-header">Second Pigment %</th>
                         <th>Third Pigment</th>
                         <th class="numerical-cell-header">Third Pigment %</th>
-                        <th class="actions-header" colspan="2"></th>
+                        <th v-if="isCurrentUserSupervisor === true" class="actions-header" colspan="2"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -169,7 +184,7 @@ watch(currentPigmentOption, async (newOption, oldOption) => {
                         <td class="numerical-cell">{{color.secondPigmentPercentage?? 'N/A'}}</td>
                         <td>{{color.thirdPigment ? color.thirdPigment : 'N/A'}}</td>
                         <td class="numerical-cell">{{color.thirdPigmentPercentage?? 'N/A'}}</td>
-                        <td class="edit-cell">
+                        <td v-if="isCurrentUserSupervisor === true" class="edit-cell">
                                 <div class="edit-cell-content-wrapper">
                                     <span 
                                         class="material-symbols-outlined edit"
@@ -178,15 +193,15 @@ watch(currentPigmentOption, async (newOption, oldOption) => {
                                     <span class="icon-label">Edit</span> 
                                 </div>
                             </td>
-                            <td class="delete-cell">
-                                <div class="delete-cell-content-wrapper">
-                                    <span 
-                                        class="material-symbols-outlined delete"
-                                        @click="displayDeleteModal(color.id, color.name)"
-                                    >delete</span>
-                                    <span class="icon-label">Delete</span>
-                                </div>
-                            </td>
+                        <td v-if="isCurrentUserSupervisor === true" class="delete-cell">
+                            <div class="delete-cell-content-wrapper">
+                                <span 
+                                    class="material-symbols-outlined delete"
+                                    @click="displayDeleteModal(color.id, color.name)"
+                                >delete</span>
+                                <span class="icon-label">Delete</span>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>

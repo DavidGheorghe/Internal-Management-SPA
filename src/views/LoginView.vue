@@ -3,7 +3,7 @@ import LoginForm from "@/components/forms/LoginForm.vue";
 import { ref } from "vue";
 
 let imgPath = ref<string>();
-imgPath.value = require("../assets/login-background-1.jpg");
+imgPath.value = require("../assets/login-background.jpg");
 </script>
 
 <template>
@@ -18,7 +18,7 @@ imgPath.value = require("../assets/login-background-1.jpg");
             <h1 class="app-name">
                 Internal Order Life Cycle and <br> Management System
             </h1>
-            <LoginForm></LoginForm>
+            <LoginForm/>
         </section>
     </div>
 </template>
@@ -42,8 +42,6 @@ imgPath.value = require("../assets/login-background-1.jpg");
     justify-items: center;
 }
 .app-name {
-    /* position: relative; */
-    /* top: 5vh; */
     text-align: center;
     font-family: "Rockwell", "Courier Bold", Courier;
 }

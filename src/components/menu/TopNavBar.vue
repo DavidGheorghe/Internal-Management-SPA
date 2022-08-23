@@ -1,24 +1,33 @@
 <script setup lang="ts">
-// import router from '@/router';
-import { useUserStore } from '@/stores/UserStore';
-import { ref } from 'vue';
-import Logo from '@/components/visual/Logo.vue';
 import AccountActions from '@/components/menu/AccountActions.vue';
+import Logo from '@/components/visual/Logo.vue';
+import { useUserStore } from '@/stores/UserStore';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const user = useUserStore();
 const router = useRouter();
 
 const areUserActionsDisplayed = ref(false);
+const isCursorOverAccountActions = ref(false);
 
-// const items = router.getRoutes()
-//     .filter(route => route.name !== 'Login' 
-//             && route.name !== 'AddProductView' 
-//             && route.name !== 'UpdateProductView');
-
-const items = router.getRoutes()
-    .filter(route => route.meta.isInNavbar === true);
-
+const items = computed(() => router.getRoutes().filter(route => {
+    let isInNavBar: boolean = false;
+    if (route.meta.isInNavbar === true) {
+        const requiredRoles: string[] | undefined = route.meta.requiredRoles;
+        const currentUserRoles = user.getCurrentUserRoles;
+        if (requiredRoles !== undefined) {
+            for (let i = 0; i < currentUserRoles.length; i++) {
+                const role = currentUserRoles[i];
+                if (requiredRoles.includes(role.toString())) {
+                    isInNavBar = true;
+                    break;
+                }
+            }
+        }
+    }
+    return isInNavBar;
+}))
 
 function toggleActions(): void {
     areUserActionsDisplayed.value = !areUserActionsDisplayed.value;
@@ -29,8 +38,10 @@ function displayActions() {
 }
 
 function hideActions(e: Event) {
-    setTimeout(() => {}, 1000);
-    areUserActionsDisplayed.value = false;
+    if (isCursorOverAccountActions.value === false) {
+        setTimeout(() => {}, 1000);
+        areUserActionsDisplayed.value = false;
+    }
 }
 
 function handleLogOut() {
@@ -59,17 +70,20 @@ function goToHome() {
             </nav>
         </div>
         <div class="account-actions">
-            <!-- TODO: use mouseenter and mouseleave events -->
             <button 
                 class="material-symbols-outlined"
                 @click="toggleActions"
-            >account_circle
+                @focusout="hideActions"
+            >
+                account_circle
             </button>
             <Teleport
                 to="#account-actions"
             >
                 <AccountActions
                     :display="areUserActionsDisplayed"
+                    @mouseenter="isCursorOverAccountActions = true"
+                    @mouseleave="isCursorOverAccountActions = false"
                     @logout="handleLogOut"
                 />
             </Teleport>

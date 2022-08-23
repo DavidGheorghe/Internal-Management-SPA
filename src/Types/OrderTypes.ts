@@ -1,6 +1,7 @@
 import { Color } from "./ColorTypes"
 import { Customer } from "./CustomerTypes"
 import { Product } from "./ProductTypes"
+import { User } from "./UserTypes"
 import { SearchSelectOption } from "./UtilsTypes"
 
 export type Order = {
@@ -10,7 +11,8 @@ export type Order = {
     dueDate: Date,
     entryDate: Date,
     customer: Customer,
-    isPinned: Boolean
+    isPinned: boolean,
+    assignee: User | null
 }
 export type DashboardOrder = {
     id: number,
@@ -19,8 +21,9 @@ export type DashboardOrder = {
     dueDate: Date,
     entryDate: Date,
     customer: Customer,
-    isPinned: Boolean,
-    isFocused: Boolean
+    isPinned: boolean,
+    isFocused: boolean,
+    assignee: User | null
 }
 
 export enum OrderStatus {

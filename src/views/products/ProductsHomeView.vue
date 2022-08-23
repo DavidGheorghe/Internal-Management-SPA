@@ -7,11 +7,13 @@ import Pagination from '@/components/controls/Pagination.vue';
 import SearchBar from '@/components/controls/SearchBar.vue';
 import SelectItem from '@/components/controls/SelectItem.vue';
 import CustomModal from '@/components/visual/CustomModal.vue';
-import paginationParamsDefaults from "@/utils/PaginationParamsDefaults";
+import { useIsCurrentUserSupervisor } from '@/composables/rolesComposables';
+import { useRemoveElement } from '@/composables/useRemoveElement';
 import { useProductsStore } from '@/stores/ProductsStore';
 import { ProductsData } from '@/types/ProductTypes';
 import { PaginationParams } from '@/types/UtilsTypes';
 import { APIUrls } from "@/utils/APIURLs";
+import paginationParamsDefaults from "@/utils/PaginationParamsDefaults";
 import { SizeType } from '@/utils/Utils';
 import { computed, reactive } from '@vue/reactivity';
 import { ref, watch } from 'vue';
@@ -33,6 +35,8 @@ const paginationParams = reactive<PaginationParams>({...paginationParamsDefaults
 paginationParams.pageSize = 15;
 
 const searchText = ref("");
+
+const isCurrentUserSupervisor = useIsCurrentUserSupervisor();
 
 const getProductsURL = computed(() => {
     let url: string = APIUrls.API_PRODUCTS_ROOT + "?pageNo=" + paginationParams.pageNo + "&pageSize=" + paginationParams.pageSize + "&sortBy=" + paginationParams.sortBy + "&sortDir=" + paginationParams.sortDir;;
@@ -134,10 +138,14 @@ function goToUpdatePage(id: number) {
     router.push(url);
 }
 
-function deleteProduct(id: number) {
-    productsStore.deleteProductById(id);
+async function deleteProduct(id: number) {
+    await productsStore.deleteProductById(id);
     updateProductsData();
     hideDeleteModal();
+    if (productsData.value?.content) {
+        const index = getIndexById(id);
+        productsData.value.content = useRemoveElement(index, productsData.value.content);
+    }
 }
 
 function displayDeleteModal(id: number, name: string) {
@@ -148,6 +156,16 @@ function displayDeleteModal(id: number, name: string) {
 
 function hideDeleteModal() {
     isDeleteModalDisplayed.value = false;
+}
+
+function getIndexById(id: number) {
+    let finalIndex: number = -1;
+    productsData.value?.content.forEach((element, index) => {
+        if (element.id === id) {
+            finalIndex = index;
+        }
+    })
+    return finalIndex;
 }
 
 watch(currentCategory, async (newCategory) => {
@@ -195,6 +213,7 @@ watch(getProductsURL, async () => {
                     class="add-button"
                     label="New Product"
                     action-type="add"
+                    :disabled="isCurrentUserSupervisor === false"
                     @click="goToAddPage"
                 />
             </div>
@@ -215,7 +234,7 @@ watch(getProductsURL, async () => {
                             <th class="numerical-cell-header prices" v-else>Price Without V.A.T. (RON)</th>
                             <th class="numerical-cell-header" v-if="showSizes">Weight (g)</th>
                             <th class="numerical-cell-header prices" v-else>Final Price (RON)</th>
-                            <th class="actions-header" colspan="2"></th>
+                            <th v-if="isCurrentUserSupervisor === true" class="actions-header" colspan="2"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -229,22 +248,38 @@ watch(getProductsURL, async () => {
                             <td class="numerical-cell" v-else>{{product.productPrices.priceWithoutVAT}}</td>
                             <td class="numerical-cell" v-if="showSizes">{{product.productSizes.weight}}</td>
                             <td class="numerical-cell" v-else>{{product.productPrices.finalPrice}}</td>
-                            <td class="edit-cell">
-                                <div class="edit-cell-content-wrapper">
+                            <td v-if="isCurrentUserSupervisor === true" class="action-cell">
+                                <div class="edit-cell-content-wrapper" @click="goToUpdatePage(product.id)">
                                     <span 
                                         class="material-symbols-outlined edit" 
                                         @click="goToUpdatePage(product.id)"
-                                    >edit</span>
+                                    >
+                                        edit
+                                    </span>
+                                    <!-- <ActionButton
+                                        class="edit-button" 
+                                        action-type="edit"
+                                        label="Edit"
+                                        :disabled="isCurrentUserSupervisor === true"
+                                        @click="goToUpdatePage(product.id)"
+                                    /> -->
                                     <span class="icon-label">Edit</span> 
                                 </div>
                             </td>
-                            <td class="delete-cell">
-                                <div class="delete-cell-content-wrapper">
-                                    <span 
+                            <td v-if="isCurrentUserSupervisor === true" class="action-cell">
+                                <div class="delete-cell-content-wrapper" @click="displayDeleteModal(product.id, product.name)"> 
+                                     <span 
                                         class="material-symbols-outlined delete"
                                         @click="displayDeleteModal(product.id, product.name)"
                                     >delete</span>
                                     <span class="icon-label">Delete</span>
+                                    <!-- <ActionButton
+                                        class="delete-button" 
+                                        action-type="delete"
+                                        label="Delete"
+                                        :disabled="isCurrentUserSupervisor === true"
+                                        @click="displayDeleteModal(product.id, product.name)"
+                                    /> -->
                                 </div>
                             </td>
                         </tr>
@@ -439,9 +474,45 @@ tbody tr:nth-child(odd) {
     }
 }
 
-.actions-cell {
+.action-cell {
     text-align: center;
+    // margin: 0 auto;
+}
+.delete-button, .edit-button {
     margin: 0 auto;
+    text-align: center;
+    border: none;
+    background-color: inherit;
+    &:hover {
+        border: none;
+        box-shadow: none;
+    }
+}
+.delete-button {
+    // color: @custom-red;
+    & .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 48;
+        font-size: 22px;
+        cursor: pointer;
+        color: @custom-red;
+    }
+}
+.edit-button {
+    // color: @custom-yellow;
+    .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 48;
+        font-size: 22px;
+        cursor: pointer;
+        color: #fde047;
+    }
 }
 
 .products-pagination {
