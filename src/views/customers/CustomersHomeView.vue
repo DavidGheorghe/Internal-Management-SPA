@@ -11,7 +11,7 @@ import { deleteCustomerById, fetchCustomers, updateCustomer } from '@/services/C
 import { Customer } from '@/types/CustomerTypes';
 import { EntityData, PaginationParams } from '@/types/UtilsTypes';
 import paginationParamsDefaults from '@/utils/PaginationParamsDefaults';
-import { reactive, ref, watchEffect } from 'vue';
+import { computed, reactive, ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 
 const customersData = ref<EntityData<Customer>>();
@@ -24,6 +24,15 @@ const searchText = ref("");
 const isDeleteModalDisplayed = ref(false);
 const customerToBeDeleted = ref<Customer>();
 
+const areCustomersAvailable = computed(() => {
+    let areAvailable: boolean = false;
+    if (customersData.value !== undefined) {
+        if (customersData.value.content.length > 0) {
+            areAvailable = true;
+        }
+    }
+    return areAvailable;
+})
 const isCurrentUserSupervisor = useIsCurrentUserSupervisor();
 
 (await initCustomersData());
@@ -76,7 +85,7 @@ function getIndexById(id: number) {
 
 
 watchEffect(async () => {
-    initCustomersData();
+    await initCustomersData();
 })
 </script>
 
@@ -97,7 +106,10 @@ watchEffect(async () => {
                     @click="goToAddPage"
                 />
             </div>
-            <div class="cards-container">
+            <div 
+                v-if="areCustomersAvailable"
+                class="cards-container"
+            >
                 <CustomerCard 
                     v-for="customer in customersData?.content"
                     :key="customer.id"
@@ -107,7 +119,14 @@ watchEffect(async () => {
                     @customer-deleted="showDeleteModal"
                 />
             </div>
+            <div 
+                v-else
+                class="no-customers"
+            >
+                <span class="no-customers-label">No Customers Available.</span>
+            </div>
             <Pagination
+                v-if="areCustomersAvailable"
                 class="pagination"
                 :last="customersData!.last"
                 :page-no="customersData!.pageNo"
@@ -215,5 +234,13 @@ watchEffect(async () => {
     background-color: @custom-green;
     width: 5rem;
     height: 2rem;
+}
+.no-customers {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &-label {
+        font-size: 2rem;
+    }
 }
 </style>

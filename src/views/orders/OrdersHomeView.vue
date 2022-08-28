@@ -3,7 +3,7 @@ import { deleteOrderById, fetchOrders, fetchOrdersByStatus } from '@/services/Or
 import { Order } from '@/types/OrderTypes';
 import { EntityData, PaginationParams } from '@/types/UtilsTypes';
 import paginationParamsDefaults from "@/utils/PaginationParamsDefaults";
-import { reactive, ref, watch, watchEffect } from 'vue';
+import { computed, reactive, ref, watch, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import OrderCard from '@/components/visual/order/OrderCard.vue';
 import SearchBar from '@/components/controls/SearchBar.vue';
@@ -33,6 +33,15 @@ const orderToBeDeleted = ref<Order>();
 const statusFilterOptions = ["ALL", ...statusesAsStrings];
 const currentStatusFilter = ref("ALL");
 
+const areOrdersAvailable = computed(() => {
+    let areAvailable: boolean = false;
+    if (ordersData.value !== undefined) {
+        if (ordersData.value.content.length > 0) {
+            areAvailable = true;
+        }
+    }
+    return areAvailable;
+});
 const isCurrentUserSupervisor = useIsCurrentUserSupervisor();
 
 (await initOrdersData());
@@ -128,7 +137,10 @@ watchEffect(() => {
                 @click="goToAddPage"
             />
             </div>
-            <div class="orders-wrapper">
+            <div 
+                v-if="areOrdersAvailable"
+                class="orders-wrapper"
+            >
                 <el-scrollbar always>
                     <div 
                         class="orders-cards"
@@ -142,7 +154,14 @@ watchEffect(() => {
                     </div>
                 </el-scrollbar>
             </div>
+            <div 
+                v-else
+                class="no-orders"
+            >
+                <span class="no-orders-label">No Orders Available.</span>
+            </div>
             <Pagination
+                v-if="areOrdersAvailable"
                 :last="ordersData!.last"
                 :page-no="ordersData!.pageNo"
                 :page-size="ordersData!.pageSize"
@@ -255,5 +274,13 @@ watchEffect(() => {
 }
 .modal-title-order-customer, .modal-title-order-id {
     color: @custom-blue;
+}
+.no-orders-label {
+    font-size: 2rem;
+}
+.no-orders {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 </style>

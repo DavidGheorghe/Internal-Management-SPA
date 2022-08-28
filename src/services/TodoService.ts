@@ -1,3 +1,4 @@
+import { useUserStore } from "@/stores/UserStore";
 import { Todo } from "@/types/TodoTypes";
 import { APIUrls, computeURLWithId } from "@/utils/APIURLs";
 import { axiosInstance } from "@/utils/Utils";
@@ -14,8 +15,9 @@ export async function addTodo(todo: Todo) {
     return newTodo;
 }
 
-export async function getTodosByUserId(userId: number) {
-    const url = computeURLWithId(APIUrls.API_TODOS_ROOT, userId);
+export async function fetchTodos() {
+    const userStore = useUserStore();
+    const url = APIUrls.API_TODOS_ROOT + "/" + userStore.getCurrentUsername;
     const response = await axiosInstance({
         method: 'get',
         url: url
@@ -50,7 +52,7 @@ function createTodoFromResponse(response: AxiosResponse<any>) {
     todo.id = response.data.id;
     todo.text = response.data.text;
     todo.isCompleted = response.data.isCompleted;
-    todo.userId = response.data.userId;
+    todo.username = response.data.username;
     return todo;
 }
 
@@ -61,7 +63,7 @@ function createTodosListFromResponse(response: AxiosResponse<any>) {
         const todoFromServer = response.data[i];
         todo.id = todoFromServer.id;
         todo.text = todoFromServer.text;
-        todo.userId = todoFromServer.userId;
+        todo.username = todoFromServer.username;
         todo.isCompleted = todoFromServer.isCompleted;
 
         todos.push(todo);

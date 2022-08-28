@@ -171,7 +171,7 @@ watch(currentPigmentOption, async (newOption, oldOption) => {
                         <th v-if="isCurrentUserSupervisor === true" class="actions-header" colspan="2"></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody v-if="colorsData!.content.length > 0">
                     <tr
                         v-for="color in colorsData?.content"
                         :key="color.id"
@@ -204,9 +204,20 @@ watch(currentPigmentOption, async (newOption, oldOption) => {
                         </td>
                     </tr>
                 </tbody>
+                <tbody v-else>
+                    <tr>
+                        <td  
+                            colspan="8"
+                            class="no-colors-available-label"
+                        >
+                            No Colors Available.
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
         <Pagination
+            v-if="colorsData!.content.length > 0"
             :last="colorsData!.last"
             :page-no="colorsData!.pageNo"
             :page-size="colorsData!.pageSize"
@@ -403,5 +414,9 @@ tbody tr:nth-child(odd) {
     width: 5rem;
     height: 2rem;
     font-weight: 600;
+}
+.no-colors-available-label {
+    text-align: center;
+    font-size: 1.7rem;
 }
 </style>

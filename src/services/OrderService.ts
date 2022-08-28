@@ -35,11 +35,11 @@ export async function fetchOrderById(id: number): Promise<Order> {
 }
 
 export async function fetchPinnedOrders() {
-    const userStore = useUserStore();
-    const url = APIUrls.API_ORDERS_ROOT + "/dashboard/" + userStore.getCurrentUserId;
+    const url = APIUrls.API_ORDERS_ROOT + "/dashboard";
     const response = await axiosInstance({
         method: 'get',
-        url: url
+        url: url,
+        withCredentials: true
     });
     const fetchedOrders = createOrdersFromResponse(response);
     return fetchedOrders;
@@ -99,7 +99,7 @@ export async function updateOrderStatus(orderId: number, statusId: number) {
 
 export async function pinOrder(id: number) {
     const userStore = useUserStore();
-    const url = APIUrls.API_ORDERS_ROOT + "/pin/" + id + "/" + userStore.getCurrentUserId;
+    const url = APIUrls.API_ORDERS_ROOT + "/pin/" + id + "/" + userStore.getCurrentUsername;
     const response = await axiosInstance({
         method: 'put',
         url: url
@@ -110,7 +110,7 @@ export async function pinOrder(id: number) {
 
 export async function unpinOrder(id: number) {
     const userStore = useUserStore();
-    const url = APIUrls.API_ORDERS_ROOT + "/unpin/" + id + "/" + userStore.getCurrentUserId;
+    const url = APIUrls.API_ORDERS_ROOT + "/unpin/" + id + "/" + userStore.getCurrentUsername;
     const response = await axiosInstance({
         method: 'put',
         url: url
@@ -119,8 +119,8 @@ export async function unpinOrder(id: number) {
     return order;
 }
 
-export async function assignOrder(orderId: number, userId: number) {
-    const url = APIUrls.API_ORDERS_ROOT + "/assign/" + orderId + "/" + userId;
+export async function assignOrder(orderId: number, username: string) {
+    const url = APIUrls.API_ORDERS_ROOT + "/assign/" + orderId + "/" + username;
     await axiosInstance({
         method: 'put',
         url: url
@@ -137,7 +137,6 @@ export async function removeAssignedOrder(orderId: number, userId: number) {
 
 export async function updateDueDate(orderId: number, newDueDate: Date) {
     const finalDueDate = formatDateAsString(newDueDate);
-    // const finalDueDate = dueDateinISOFormat.substring(0, 10);
     const url = APIUrls.API_ORDERS_ROOT + "/due-date?id=" + orderId +"&due-date=" + finalDueDate;
     const response = await axiosInstance({
         method: 'put',

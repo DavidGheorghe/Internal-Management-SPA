@@ -2,8 +2,9 @@ import { OrderStatus } from '@/types/OrderTypes';
 import { Role } from '@/types/Role';
 import { EntityData } from '@/types/UtilsTypes';
 import axios, { AxiosResponse } from 'axios';
+import { reactive } from 'vue';
 import { APIUrls } from './APIURLs';
-import { getLocalAccessToken, getRefreshToken } from './JWTUtils';
+import { getRefreshToken } from './JWTUtils';
 
 export enum SizeType {
     SMALL = "small",
@@ -11,14 +12,9 @@ export enum SizeType {
     LARGE = "large"
 }
 
-const requestHeaders = {
-    "Content-Type" : "application/json",
-    "Authorization" : getLocalAccessToken()
-}
-
 export const axiosInstance = axios.create({
     baseURL: APIUrls.BASE_URL,
-    headers: requestHeaders
+    withCredentials: true
 });
 
 axiosInstance.interceptors.response.use(
@@ -34,19 +30,19 @@ axiosInstance.interceptors.response.use(
                     const rs = await getRefreshToken();
                     const accessToken  = rs.headers["refresh-token"];
                     localStorage.setItem("accessToken", accessToken);
-                    return axiosInstance(originalConfig);
+                    return await axiosInstance(originalConfig);
                 } catch (_error: any) {
                     if (_error.response && _error.response.data) {
                         return Promise.reject(_error.response.data);
                     }
-                    return Promise.reject(_error);
+                    return await Promise.reject(_error);
                 }
             }
             if (err.response.status === 403 && err.response.data) {
-                return Promise.reject(err.response.data);
+                return await Promise.reject(err.response.data);
             }
         }
-        return Promise.reject(err);
+        return await Promise.reject(err);
     }
 )
 
@@ -133,3 +129,4 @@ export function getIdsFromRoles(roles: Role[]) {
     }
     return ids;
 }
+

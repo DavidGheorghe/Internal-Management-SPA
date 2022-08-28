@@ -22,6 +22,7 @@ import PageNotFoundView from '@/views/PageNotFoundView.vue'
 import { useUserStore } from '@/stores/UserStore'
 import { Role } from '@/types/Role';
 import { useIsCurrentUserAdmin, useIsCurrentUserSupervisor } from '@/composables/rolesComposables'
+import { APIUrls } from '@/utils/APIURLs'
 
 const goToLoginIfNotAuthenticated = (to: RouteLocationNormalized, from: RouteLocationNormalized) => {
 	const userStore = useUserStore();

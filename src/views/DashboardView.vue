@@ -13,11 +13,9 @@ const expandedOrderStore = useExpandedOrderStore();
 
 const orders = ref<DashboardOrder[]>(await initPinnedOrders());
 
-
-
 async function initPinnedOrders() {
-    const orders = (await fetchPinnedOrders());
-    return orders.map(order => {
+    const fetchedOrders = (await fetchPinnedOrders());
+    return fetchedOrders.map(order => {
         return {...order, isFocused: false}
     }) 
 }
@@ -132,7 +130,6 @@ function displaySidebar() {
             <Transition>
                 <TodosSideBar 
                     v-show="todosSidebarStore.isDisplayed"
-                    
                     ref="sidebarRef"
                     @hide-sidebar="hideSidebar"
                 />

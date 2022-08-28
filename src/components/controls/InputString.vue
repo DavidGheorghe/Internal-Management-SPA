@@ -60,6 +60,7 @@ const value = computed({
     align-items: center;
     justify-content: center;
     position: relative;
+    box-sizing: border-box;
 }
 
 label, input {
@@ -67,11 +68,13 @@ label, input {
 }
 
 input {
+    border-top: 1px solid transparent;
     border-bottom: 1px solid #aba6a6;
     width: 100%;
     height: 50%;
     &:focus {
-        border-bottom: 1px solid @custom-blue;
+        border-top: none;
+        border-bottom: 2px solid @custom-blue;
     }
 }
 

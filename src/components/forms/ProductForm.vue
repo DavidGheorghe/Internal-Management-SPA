@@ -32,8 +32,8 @@ const productionCost = ref<number | null>(props.updatedProduct?.productPrices.pr
 const categoryId = ref<number| null>(props.updatedProduct?.productCategory.id || null);
 const categoryFilterText = ref<string>(props.updatedProduct?.productCategory.categoryName || "");
 
-const isSubmitButtonDisabled = computed(() => name.value === "" && height.value === null && diameter.value === null 
-    && weight.value === null && priceWithoutVAT.value === null && productionCost.value === null && categoryFilterText.value === "");
+const isSubmitButtonDisabled = computed(() => name.value === "" || height.value === null || diameter.value === null 
+    || weight.value === null || priceWithoutVAT.value === null || productionCost.value === null || categoryFilterText.value === "");
 
 (await getProductsCategories());
 

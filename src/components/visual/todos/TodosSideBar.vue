@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getTodosByUserId, addTodo, deleteById } from '@/services/TodoService';
+import { fetchTodos, addTodo, deleteById } from '@/services/TodoService';
 import { useUserStore } from '@/stores/UserStore';
 import { Todo } from '@/types/TodoTypes';
 import { ref, watch, computed } from 'vue';
@@ -20,14 +20,14 @@ const isNewTodoAdded = ref(false);
 const isSidebarEmpty = computed(() => todos.value.length === 0 && isNewTodoAdded.value === false);
 
 async function initTodos() {
-    todos.value = (await getTodosByUserId(userStore.getCurrentUserId!)).reverse();
+    todos.value = (await fetchTodos()).reverse();
 }
 
 function addTodoFront(text: string) {
     const newTodo = {
         isCompleted: false,
         text: text,
-        userId: userStore.getCurrentUserId
+        username: userStore.getCurrentUsername
     } as Todo;
     addTodo(newTodo);
     todos.value.unshift(newTodo);

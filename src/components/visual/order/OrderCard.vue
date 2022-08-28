@@ -30,9 +30,17 @@ const isOrderPinned = ref(props.order.isPinned);
 
 const isCurrentUserSupervisor = useIsCurrentUserSupervisor();
 
-const isStatusSelectDisabled = computed(() => props.order.assignee?.username !== userStore.getCurrentUsername);
+const isStatusSelectDisabled = computed(() => {
+    let isDisabled: boolean = false;
+    if (isCurrentUserSupervisor === false) {
+        if (props.order.assignee?.username !== userStore.getCurrentUsername) {
+            isDisabled = true;
+        }
+    }
+    return isDisabled;
+});
 
-const currentAssigneeId = ref(props.order.assignee !== null ? props.order.assignee.id : null);
+const currentAssigneeId = ref(props.order.assignee !== null ? props.order.assignee.username : null);
 const employees = ref(await fetchEmployees());
 
 function displayContentModal() {
@@ -176,9 +184,9 @@ watch(currentAssigneeId, (newValue) => {
                 >
                     <el-option
                         v-for="employee in employees"
-                        :key="employee.id"
+                        :key="employee.username"
                         :label="employee.username"
-                        :value="employee.id"
+                        :value="employee.username"
                     />
                 </el-select>
                 <div class="due">

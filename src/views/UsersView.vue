@@ -5,7 +5,7 @@ import CreateUserModal from '@/components/visual/CreateUserModal.vue';
 import CustomModal from '@/components/visual/CustomModal.vue';
 import UserCard from '@/components/visual/UserCard.vue';
 import { useRemoveElement } from '@/composables/useRemoveElement';
-import { deleteUserById, fetchUsers } from '@/services/UserService';
+import { deleteUserByUsername, fetchUsers } from '@/services/UserService';
 import { User } from '@/types/UserTypes';
 import { ref } from 'vue';
 
@@ -40,11 +40,11 @@ function hideCreateUserModal() {
     isCreateUserModalDisplayed.value = false;
 }
 
-async function deleteUser(id: number) {
-    await deleteUserById(id);
+async function deleteUser(username: string) {
+    await deleteUserByUsername(username);
     hideDeleteModal();
     if(users.value) {
-        const index = getIndexById(id);
+        const index = getIndexById(userToDelete.value!.id);
         users.value = useRemoveElement(index, users.value);
     }
 }
@@ -110,7 +110,7 @@ function getIndexById(id: number) {
                     <SimpleButton 
                         class="ok-button"
                         label="Ok"
-                        @click="deleteUser(userToDelete!.id)"
+                        @click="deleteUser(userToDelete!.username)"
                     />
                 </template>
             </CustomModal>

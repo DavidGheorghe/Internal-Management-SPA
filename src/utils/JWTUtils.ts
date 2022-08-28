@@ -3,11 +3,19 @@ import { APIUrls } from "@/utils/APIURLs";
 import jwt_decode from "jwt-decode";
 import { useUserStore } from "@/stores/UserStore";
 import { axiosInstance } from "./Utils";
+import { Role } from "@/types/Role";
+import { computeStatusFromString } from "./OrderServiceUtils";
 
 export interface JWTExpiration {
     // name: string,
     exp: number,
 
+}
+
+export interface JWTDecoded {
+    username: string,
+    exp: number,
+    roles: string[]
 }
 
 export function getJWTExpiryDateInMills(): number | undefined {
@@ -30,10 +38,6 @@ export function getLocalRefreshToken(): string {
 }
 
 export async function getRefreshToken() {
-    // return await axiosInstance({
-    //     method: 'get',
-    //     url: APIUrls.API_REFRESH_TOKEN
-    // })
     return await axios({
         url: APIUrls.API_REFRESH_TOKEN,
         headers: {
@@ -52,5 +56,39 @@ export function logoutAfterJWTExpiration() {
             userStore.logOut();
         }, expirationTimeInMills);
     }
-    
+}
+
+export function formatJWT(token: string): string {
+    const formattedToken = token ; //token.substring(7);
+    return formattedToken;
+}
+
+export function getUsernameFromToken(token: string): string {
+    const decodedJwt = jwt_decode<JWTDecoded>(token);
+    return decodedJwt['username'];
+}
+
+export function getRolesFromToken(token: string): Role[] {
+    const roles: Role[] = [];
+    const decodedJwt = jwt_decode<JWTDecoded>(token);
+    const rolesStr = decodedJwt['roles'];
+    rolesStr.forEach(roleStr => {
+        const roleStrFormatted = roleStr.substring(5);
+        const role = computeStatusFromString(roleStrFormatted);
+        if (role) {
+            roles.push(role);
+        }
+    })
+    return roles;
+}
+
+export function getRolesAsStrFromToken(token: string): string[] {
+    const roles: string[] = [];
+    const decodedJwt = jwt_decode<JWTDecoded>(token);
+    const rolesStr = decodedJwt['roles'];
+    rolesStr.forEach(roleStr => {
+        const roleStrFormatted = roleStr.substring(5); // Remove 'ROLE_'
+        roles.push(roleStrFormatted);
+    })
+    return roles;
 }

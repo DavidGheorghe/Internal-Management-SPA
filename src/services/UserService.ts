@@ -38,8 +38,8 @@ export async function fetchEmployees() {
     return fetchedUsers;
 }
 
-export async function deleteUserById(id: number) {
-    const url = APIUrls.API_USERS_ROOT + "/" + id;
+export async function deleteUserByUsername(username: string) {
+    const url = APIUrls.API_USERS_ROOT + "/" + username;
     await axiosInstance({
         method: 'delete',
         url: url

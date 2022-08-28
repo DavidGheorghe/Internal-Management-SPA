@@ -282,7 +282,7 @@ const customerEditedSuccessfully = () => {
     position: relative;
     display: grid;
     grid-template-rows: auto;
-    grid-template-columns: 1.5fr 1.5fr 1.5fr 1fr;
+    grid-template-columns: 1.5fr 1.25fr 1.75fr 1fr;
 }
 .details, .addresses, .contact {
     display: grid;

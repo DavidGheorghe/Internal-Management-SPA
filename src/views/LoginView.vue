@@ -16,9 +16,11 @@ imgPath.value = require("../assets/login-background.jpg");
         </section>
         <section class="login-section">
             <h1 class="app-name">
-                Internal Order Life Cycle and <br> Management System
+                Internal Order Tracking and <br> Management System
             </h1>
-            <LoginForm/>
+            <!-- <Suspense> -->
+                <LoginForm/>
+            <!-- </Suspense> -->
         </section>
     </div>
 </template>

@@ -5,29 +5,44 @@ import LoadingSpinner from '@/components/visual/LoadingSpinner.vue';
 import Logo from '@/components/visual/Logo.vue';
 import InputString from '@/components/controls/InputString.vue';
 import SubmitButton from '../buttons/SubmitButton.vue';
+import { useRouter } from 'vue-router';
 
 let username = ref<string>("");
 let password = ref<string>("");
 
+const router = useRouter();
 const userStore = useUserStore();
 
-let failedAuthentication = ref(false);
-let loading = ref(false);
+let isAuthenticationFailed = ref(false);
+let loadingFlag = ref(false);
 
 async function login() {
     if (username.value !== "" && password.value !== "") {
-        failedAuthentication.value = false;
-        if (!failedAuthentication.value) {
-            loading.value = true;
+        isAuthenticationFailed.value = false;
+        if (!isAuthenticationFailed.value) {
+            loadingFlag.value = true;
         } else {
-            loading.value = false;
+            loadingFlag.value = false;
         }
-        await userStore.logIn(username.value, password.value)
-            .catch(() => {
-                failedAuthentication.value = true;
-                loading.value = false;
-                password.value = "";
-            });
+        try {
+             await userStore.logIn(username.value, password.value)
+            //  .then(
+                // () => {
+                    router.push("/");
+                // }
+            // );
+        } catch (error) {
+            isAuthenticationFailed.value = true;
+            loadingFlag.value = false;
+            password.value = "";
+        }
+        // await userStore.logIn(username.value, password.value)
+        //     .catch(() => {
+        //         isAuthenticationFailed.value = true;
+        //         loadingFlag.value = false;
+        //         password.value = "";
+        //     });
+        // router.push("/");
     }
 }
 </script>
@@ -40,34 +55,34 @@ async function login() {
         ></Logo>
         <form @submit.prevent> 
             <span 
-                v-show="failedAuthentication"
+                v-show="isAuthenticationFailed"
                 class="wrong-credentials-notification" 
             >
                 Wrong username or password!
             </span>
-                <InputString 
-                    class="username-input"
-                    type="text"
-                    v-model="username"
-                    placeholder="Username"
-                    :required="username === '' || username === undefined"
-                />
-                <InputString 
-                    class="password-input"
-                    type="password"
-                    v-model="password"
-                    placeholder="Password"
-                    :required="password === ''  || password === undefined"
-                />
+            <InputString 
+                class="username-input"
+                type="text"
+                v-model="username"
+                placeholder="Username"
+                :required="username === '' || username === undefined"
+            />
+            <InputString 
+                class="password-input"
+                type="password"
+                v-model="password"
+                placeholder="Password"
+                :required="password === ''  || password === undefined"
+            />
             <LoadingSpinner
                 class="spinner"
-                :active="loading"
+                :active="loadingFlag"
                 text="Loading..."
             />
             <SubmitButton 
                 class="login-button"
                 label="Log In"
-                :is-disabled="loading"
+                :is-disabled="loadingFlag"
                 @click="login"
             />
         </form>

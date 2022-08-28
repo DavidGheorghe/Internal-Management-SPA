@@ -19,4 +19,3 @@ export type PaginationParams = {
     sortDir: string
     // searchText
 }
-

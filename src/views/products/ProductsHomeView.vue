@@ -57,7 +57,15 @@ const pagesNumbers = ref<number[]>([]);
 let productsData = ref<ProductsData>();
 let productsCategories = ref<string[]>([]);
 
-// const filteredProducts = computed(() => productsData.value?.content.filter((product) => product.name.includes(searchText.value)));
+const isTableEmpty = computed(() => {
+    let isEmpty = true;
+    if (productsData.value !== undefined) {
+        if (productsData.value.content.length > 0) {
+            isEmpty = false;
+        }
+    }
+    return isEmpty;
+});
 
 (await updateProductsData());
 (await updateProductsCategoriesNames());
@@ -237,7 +245,7 @@ watch(getProductsURL, async () => {
                             <th v-if="isCurrentUserSupervisor === true" class="actions-header" colspan="2"></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="isTableEmpty === false">
                         <tr v-for="product in productsData?.content" :key="product.id">
                             <td>{{product.id}}</td>
                             <td class="name">{{product.name}}</td>
@@ -256,37 +264,36 @@ watch(getProductsURL, async () => {
                                     >
                                         edit
                                     </span>
-                                    <!-- <ActionButton
-                                        class="edit-button" 
-                                        action-type="edit"
-                                        label="Edit"
-                                        :disabled="isCurrentUserSupervisor === true"
-                                        @click="goToUpdatePage(product.id)"
-                                    /> -->
                                     <span class="icon-label">Edit</span> 
                                 </div>
                             </td>
                             <td v-if="isCurrentUserSupervisor === true" class="action-cell">
                                 <div class="delete-cell-content-wrapper" @click="displayDeleteModal(product.id, product.name)"> 
-                                     <span 
+                                    <span 
                                         class="material-symbols-outlined delete"
                                         @click="displayDeleteModal(product.id, product.name)"
-                                    >delete</span>
+                                    >
+                                        delete
+                                    </span>
                                     <span class="icon-label">Delete</span>
-                                    <!-- <ActionButton
-                                        class="delete-button" 
-                                        action-type="delete"
-                                        label="Delete"
-                                        :disabled="isCurrentUserSupervisor === true"
-                                        @click="displayDeleteModal(product.id, product.name)"
-                                    /> -->
                                 </div>
                             </td>
                         </tr>
                     </tbody>
+                    <tbody v-else>
+                    <tr>
+                        <td  
+                            colspan="8"
+                            class="no-colors-available-label"
+                        >
+                            No Colors Available.
+                        </td>
+                    </tr>
+                </tbody>
                 </table>
             </div>
             <Pagination
+                v-if="isTableEmpty === false"
                 class="products-pagination"
                 :page-no="productsData!.pageNo"
                 :page-size="productsData!.pageSize"
@@ -553,5 +560,9 @@ tbody tr:nth-child(odd) {
     width: 5rem;
     height: 2rem;
     font-weight: 600;
+}
+.no-colors-available-label {
+    text-align: center;
+    font-size: 1.7rem;
 }
 </style>

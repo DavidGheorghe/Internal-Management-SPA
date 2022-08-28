@@ -23,10 +23,10 @@ const email = ref("");
 const billingAddress = ref("");
 const deliveryAddress = ref("");
 
-const isSubmitButtonDisabled = computed(() => companyName.value === "" && companyName.value === "" && 
-        companyName.value === "" && companyName.value === "" && 
-        companyName.value === "" && companyName.value === "" && 
-        companyName.value === "" && companyName.value === ""); 
+const isSubmitButtonDisabled = computed(() => companyName.value === "" || firstName.value === ""|| 
+        lastName.value === "" || cui.value === "" || 
+        phoneNumber.value === "" || email.value === "" || 
+        billingAddress.value === "" || deliveryAddress.value === ""); 
 
 function saveCustomer() {
     const customer = {} as CustomerDTO;
