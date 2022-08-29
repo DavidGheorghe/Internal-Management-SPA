@@ -40,7 +40,7 @@ const isStatusSelectDisabled = computed(() => {
     return isDisabled;
 });
 
-const currentAssigneeId = ref(props.order.assignee !== null ? props.order.assignee.username : null);
+const currentAssigneeUsername = ref(props.order.assignee !== null ? props.order.assignee.username : null);
 const employees = ref(await fetchEmployees());
 
 function displayContentModal() {
@@ -138,7 +138,7 @@ watch(currentDueDate, (newValue, oldValue) => {
     dueDateModifiedNotification();
 });
 
-watch(currentAssigneeId, (newValue) => {
+watch(currentAssigneeUsername, (newValue) => {
     try {
         if (newValue !== null) {
             assignOrder(props.order.id, newValue);
@@ -178,7 +178,7 @@ watch(currentAssigneeId, (newValue) => {
 
                 <el-select
                     class="assignee"
-                    v-model="currentAssigneeId"
+                    v-model="currentAssigneeUsername"
                     placeholder="Select asignee"
                     :disabled="isCurrentUserSupervisor === false"
                 >

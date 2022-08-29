@@ -286,7 +286,7 @@ watch(getProductsURL, async () => {
                             colspan="8"
                             class="no-colors-available-label"
                         >
-                            No Colors Available.
+                            No Products Available.
                         </td>
                     </tr>
                 </tbody>

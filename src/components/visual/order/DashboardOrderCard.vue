@@ -22,7 +22,7 @@ const currentStatus = ref(props.order.status);
 const isOrderPinned = ref(props.order.isPinned);
 const isCurrentUserSupervisor = useIsCurrentUserSupervisor();
 
-const currentAssigneeId = ref(props.order.assignee !== null ? props.order.assignee.id : null);
+const currentAssigneeId = ref(props.order.assignee !== null ? props.order.assignee.username : null);
 const employees = ref(await fetchEmployees());
 
 function pinOrderClient() {
@@ -160,9 +160,9 @@ function doNotSendEvent(event: Event) {
             >
                 <el-option
                     v-for="employee in employees"
-                    :key="employee.id"
+                    :key="employee.username"
                     :label="employee.username"
-                    :value="employee.id"
+                    :value="employee.username"
                 />
             </el-select>
             <div 
