@@ -1,24 +1,9 @@
-# frontend
+# Frontend part of Internal Management Order Application.
+## Description
+The project is a Single Page Application, is implemented in VueJS 3, using Composition API, along with TypeScript, and its main purpose is to consume this [REST API](https://github.com/DavidGheorghe/Internal-management-REST-application), which serves as backend for the application. Moreover, for state management, Pinia is used, and for trivial components the choice is [Element Plus](https://element-plus.org/en-US/). The project contains a Dockerfile, which helps creating a Docker image and use it further to interact with other Docker containers. 
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Instructions
+- Clone the repository.
+- Open the project in the preferred IDE.
+- Open a terminal in the project directory.
+- Run 'npm install' in order to install the neccessary dependencies.
